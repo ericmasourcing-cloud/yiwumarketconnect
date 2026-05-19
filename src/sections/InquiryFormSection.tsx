@@ -3,7 +3,7 @@ import SectionLabel from '@/components/SectionLabel'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 // TODO: Replace with your Google Apps Script Web App URL after deployment
-const FORM_API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'
+// const FORM_API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'
 
 export default function InquiryFormSection() {
   const sectionRef = useScrollReveal<HTMLDivElement>({ y: 40 })
