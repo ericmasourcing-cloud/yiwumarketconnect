@@ -30,17 +30,21 @@ export default function InquiryFormSection() {
     setError('')
 
     try {
-      // Use no-cors mode for Google Apps Script CORS compatibility
+      // Use URL-encoded form data (most compatible with Google Apps Script)
+      const params = new URLSearchParams()
+      params.append('name', formData.name)
+      params.append('email', formData.email)
+      params.append('whatsapp', formData.whatsapp)
+      params.append('businessType', formData.businessType)
+      params.append('productDescription', formData.productDescription)
+      params.append('orderVolume', formData.orderVolume)
+      params.append('shippingCountry', formData.shippingCountry)
+      params.append('source', 'Website')
+      
       await fetch(FORM_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        mode: 'no-cors',
-        body: JSON.stringify({
-          ...formData,
-          source: 'Website'
-        }),
+        body: params,
       })
-      // no-cors mode doesn't return readable response, assume success
       setSubmitted(true)
       setFormData({ name: '', email: '', whatsapp: '', businessType: '', productDescription: '', orderVolume: '', shippingCountry: '' })
     } catch {
