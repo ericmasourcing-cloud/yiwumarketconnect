@@ -2,7 +2,7 @@ import { useState } from 'react'
 import SectionLabel from '@/components/SectionLabel'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
-const FORM_API_URL = 'https://script.google.com/macros/s/AKfycbwGpjayrb00aNF_5nF5Nn5SP7Nl7U9qv6eGZIoV2lcQz_iZ1817hRiTdlDg33YljCYpOA/exec'
+const FORM_API_URL = 'https://script.google.com/macros/s/AKfycbwvQURz7UvnAk9UygwsZRJ1CTEOOq8tke9gEJ0bTQTIrdPodhjWzjarR-9oILLcRcRd/exec'
 
 export default function InquiryFormSection() {
   const sectionRef = useScrollReveal<HTMLDivElement>({ y: 40 })
