@@ -2,8 +2,7 @@ import { useState } from 'react'
 import SectionLabel from '@/components/SectionLabel'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
-// TODO: Replace with your Google Apps Script Web App URL after deployment
-// const FORM_API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'
+const FORM_API_URL = 'https://script.google.com/macros/s/AKfycbwGpjayrb00aNF_5nF5Nn5SP7Nl7U9qv6eGZIoV2lcQz_iZ1817hRiTdlDg33YljCYpOA/exec'
 
 export default function InquiryFormSection() {
   const sectionRef = useScrollReveal<HTMLDivElement>({ y: 40 })
@@ -31,8 +30,6 @@ export default function InquiryFormSection() {
     setError('')
 
     try {
-      // If using Google Apps Script, uncomment this block:
-      /*
       const response = await fetch(FORM_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,12 +45,6 @@ export default function InquiryFormSection() {
       } else {
         setError(result.message || 'Something went wrong. Please try again.')
       }
-      */
-
-      // Demo mode - remove this when API is connected
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setSubmitted(true)
-      setFormData({ name: '', email: '', whatsapp: '', businessType: '', productDescription: '', orderVolume: '', shippingCountry: '' })
     } catch {
       setError('Network error. Please try again or contact me on WhatsApp.')
     } finally {
