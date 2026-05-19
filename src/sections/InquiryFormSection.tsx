@@ -30,21 +30,19 @@ export default function InquiryFormSection() {
     setError('')
 
     try {
-      const response = await fetch(FORM_API_URL, {
+      // Use no-cors mode for Google Apps Script CORS compatibility
+      await fetch(FORM_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
+        mode: 'no-cors',
         body: JSON.stringify({
           ...formData,
           source: 'Website'
         }),
       })
-      const result = await response.json()
-      if (result.success) {
-        setSubmitted(true)
-        setFormData({ name: '', email: '', whatsapp: '', businessType: '', productDescription: '', orderVolume: '', shippingCountry: '' })
-      } else {
-        setError(result.message || 'Something went wrong. Please try again.')
-      }
+      // no-cors mode doesn't return readable response, assume success
+      setSubmitted(true)
+      setFormData({ name: '', email: '', whatsapp: '', businessType: '', productDescription: '', orderVolume: '', shippingCountry: '' })
     } catch {
       setError('Network error. Please try again or contact me on WhatsApp.')
     } finally {
