@@ -129,7 +129,7 @@ export default function WhyYiwuSection() {
           className="reveal-child font-body text-[18px] leading-[1.7] max-w-[720px] mx-auto mt-12 text-center"
           style={{ color: 'var(--navy-60)' }}
         >
-          Yiwu Market isn't a website — it's a physical city of products. You can't compare prices online because most suppliers don't list publicly. That's why having someone on the ground matters. I visit the market 5 days a week, compare real samples, negotiate face-to-face, and find options that match your budget and quality needs.
+          Yiwu Market isn't a website — it's a physical city of products. You can't compare prices online because most suppliers don't list publicly. That's why having someone on the ground matters. I spend 5 days a week at the market and supplier factories, comparing real samples, negotiating face-to-face, and checking production quality in person. I find options that match your budget and quality needs — so you don't have to fly to China to know what you're getting.
         </p>
       </div>
     </section>

@@ -5,10 +5,10 @@ import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 const stats = [
   {
-    number: 20,
+    number: 30,
     suffix: '+',
     label: 'Countries Served',
-    description: 'Clients worldwide',
+    description: 'Europe, Americas, Middle East, Africa & Asia',
   },
   {
     number: 5,

@@ -37,7 +37,7 @@ export default function TrustSection() {
           className="font-body text-[18px] leading-[1.7] max-w-[640px] mt-5"
           style={{ color: 'var(--navy-60)' }}
         >
-          I don't have 200 staff or a fancy office. What I have is 5 years of walking Yiwu Market every week, a network of verified suppliers, and a commitment to being honest about what I can and can't do.
+          I don't have 200 staff or a fancy office. What I have is 5 years on the ground — 5 days a week walking the market aisles and visiting supplier factories. I know which districts have the best products, which suppliers deliver on time, and how to negotiate for small orders. My clients come from Europe, North America, Australia, the Middle East, Africa, and Southeast Asia — over 30 countries and counting. No hidden fees, no false promises, just honest work.
         </p>
 
         {/* Trust Badges */}
@@ -77,7 +77,7 @@ export default function TrustSection() {
               className="font-body text-[16px] leading-[1.7] mt-3"
               style={{ color: 'var(--navy-60)' }}
             >
-              I've been walking the aisles of Yiwu Market since 2018. I know which districts have the best toys, which suppliers actually deliver on time, and how to negotiate for small orders. I work with clients from over 20 countries. I'm best at written communication — WhatsApp messages, detailed emails, and photo/video updates. I use translation tools to make sure every product spec, price, and instruction is 100% accurate. No misunderstandings, no surprises. My job is simple: be your trusted eyes and hands in the world's biggest product market.
+              I've been a full-time Yiwu Market agent since 2018. Five days a week, I'm at the market or visiting supplier factories — checking production lines, comparing samples in person, and building relationships with reliable vendors. I work with clients from over 30 countries across Europe, North America, the Middle East, Africa, and Southeast Asia. I'm best at written communication — detailed WhatsApp updates, photo reports, and clear emails. I use professional translation tools to make sure every product spec, price, and instruction is accurate. My clients trust me because they can see exactly what I see, in real time. No surprises, no shortcuts — just honest work as your eyes and hands in the world's biggest product market.
             </p>
           </div>
         </div>

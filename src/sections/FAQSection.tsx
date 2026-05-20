@@ -41,7 +41,7 @@ const faqs = [
   },
   {
     question: 'Which countries do you ship to?',
-    answer: 'I work with clients from over 20 countries including the USA, UK, Germany, Netherlands, Australia, Canada, France, Spain, Japan, and many more. I can coordinate shipping to almost any destination via sea freight, air freight, or express courier. I work with trusted freight forwarders I\'ve built relationships with over the years, so you get competitive shipping rates and reliable delivery.',
+    answer: 'I work with clients from over 30 countries across Europe (UK, Germany, Netherlands, France, Spain, Italy, Poland), North America (USA, Canada), Australia, the Middle East (UAE, Saudi Arabia, Qatar), Africa (South Africa, Nigeria, Kenya), and Southeast Asia (Singapore, Malaysia, Thailand, Philippines). I can coordinate shipping to almost any destination via sea freight, air freight, or express courier. I work with trusted freight forwarders I\'ve built relationships with over the years, so you get competitive shipping rates and reliable delivery regardless of where you are.',
     keywords: ['shipping countries', 'international shipping', 'freight forwarder'],
   },
 ]
