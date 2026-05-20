@@ -2,10 +2,6 @@ import { useState, useEffect } from 'react'
 import SectionLabel from '@/components/SectionLabel'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { ChevronLeft, ChevronRight, Star, Download, CheckCircle } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const testimonials = [
   {

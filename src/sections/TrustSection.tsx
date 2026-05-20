@@ -2,27 +2,6 @@ import { Shield, Camera, Headphones, Clock, User } from 'lucide-react'
 import SectionLabel from '@/components/SectionLabel'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
-const testimonials = [
-  {
-    quote: "Eric helped me find a reliable toy supplier with a MOQ of just 100 pieces — way lower than what I found online. He sent detailed photos and even caught a color issue before shipment. Highly recommend.",
-    name: 'Sarah K.',
-    role: 'Toy Store Owner, Germany',
-    initials: 'SK',
-  },
-  {
-    quote: "I was skeptical about working with someone in China I'd never met. But Eric was responsive, honest about pricing, and the samples he collected matched exactly what he described. Saved me a trip.",
-    name: 'Marcus T.',
-    role: 'Online Seller, Netherlands',
-    initials: 'MT',
-  },
-  {
-    quote: 'We needed custom packaging for our gift boxes and Eric handled the back-and-forth with the supplier for three rounds of mockups. The final boxes looked perfect. He really takes care of the details.',
-    name: 'Aiko N.',
-    role: 'Boutique Gift Shop, Japan',
-    initials: 'AN',
-  },
-]
-
 const badges = [
   { icon: Shield, color: 'var(--green)', text: 'Verified Supplier Network' },
   { icon: Camera, color: 'var(--blue)', text: 'Real Product Photos' },
@@ -31,11 +10,6 @@ const badges = [
 ]
 
 export default function TrustSection() {
-  const cardsRef = useScrollReveal<HTMLDivElement>({
-    childSelector: '.testimonial-card',
-    stagger: 0.1,
-    y: 40,
-  })
   const badgesRef = useScrollReveal<HTMLDivElement>({
     childSelector: '.badge-item',
     stagger: 0.08,
@@ -47,7 +21,7 @@ export default function TrustSection() {
   return (
     <section id="about" style={{ background: 'var(--warm-white)' }}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-12 py-[80px] md:py-[120px]">
-        <SectionLabel text="TRUST & TESTIMONIALS" />
+        <SectionLabel text="TRUST & CREDIBILITY" />
         <h2
           className="font-display font-medium mt-4"
           style={{
@@ -57,51 +31,19 @@ export default function TrustSection() {
             color: 'var(--navy)',
           }}
         >
-          Trusted by Small Businesses Worldwide
+          Why Clients Trust Me
         </h2>
-
-        {/* Testimonial Cards */}
-        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-          {testimonials.map((t) => (
-            <div
-              key={t.name}
-              className="testimonial-card bg-white rounded-2xl p-10 border"
-              style={{
-                borderColor: 'var(--navy-15)',
-                boxShadow: '0 8px 32px rgba(10, 37, 64, 0.08)',
-              }}
-            >
-              <p
-                className="font-body text-[16px] leading-[1.6] italic"
-                style={{ color: 'var(--navy-60)' }}
-              >
-                <span className="font-display text-[24px]" style={{ color: 'var(--orange)' }}>"</span>
-                {t.quote}
-              </p>
-              <div className="flex items-center gap-3 mt-6">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center font-display text-[16px] font-medium text-white flex-shrink-0"
-                  style={{ background: 'var(--navy)' }}
-                >
-                  {t.initials}
-                </div>
-                <div>
-                  <p className="font-display text-[16px] font-medium" style={{ color: 'var(--navy)' }}>
-                    {t.name}
-                  </p>
-                  <p className="font-body text-[14px]" style={{ color: 'var(--navy-60)' }}>
-                    {t.role}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <p
+          className="font-body text-[18px] leading-[1.7] max-w-[640px] mt-5"
+          style={{ color: 'var(--navy-60)' }}
+        >
+          I don't have 200 staff or a fancy office. What I have is 5 years of walking Yiwu Market every week, a network of verified suppliers, and a commitment to being honest about what I can and can't do.
+        </p>
 
         {/* Trust Badges */}
         <div
           ref={badgesRef}
-          className="flex flex-wrap justify-center gap-8 md:gap-12 mt-16"
+          className="flex flex-wrap justify-center gap-8 md:gap-12 mt-12"
         >
           {badges.map((b) => (
             <div
