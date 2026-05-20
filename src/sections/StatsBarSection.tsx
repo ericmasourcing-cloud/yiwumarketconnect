@@ -3,56 +3,24 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
-const stats = [
-  {
-    number: 30,
-    suffix: '+',
-    label: 'Countries Served',
-    description: 'Europe, Americas, Middle East, Africa & Asia',
-  },
-  {
-    number: 5,
-    suffix: '+',
-    label: 'Years Experience',
-    description: 'In Yiwu Market since 2018',
-  },
-  {
-    number: 500,
-    suffix: '+',
-    label: 'Products Sourced',
-    description: 'Across all categories',
-  },
-  {
-    number: 24,
-    suffix: 'h',
-    label: 'Response Time',
-    description: 'Always fast reply',
-  },
-  {
-    number: 100,
-    suffix: '%',
-    label: 'Quality Checked',
-    description: 'Before every shipment',
-  },
-  {
-    number: 50,
-    suffix: '-100',
-    label: 'Pieces MOQ',
-    description: 'Low minimum orders',
-  },
-]
-
 gsap.registerPlugin(ScrollTrigger)
 
-function AnimatedNumber({ stat }: { stat: typeof stats[0] }) {
+const stats = [
+  { number: 30, suffix: '+', label: 'Countries', sub: 'Served Worldwide' },
+  { number: 5, suffix: '+', label: 'Years', sub: 'In Yiwu Market' },
+  { number: 500, suffix: '+', label: 'Products', sub: 'Sourced & Delivered' },
+  { number: 100, suffix: '%', label: 'Orders', sub: 'Quality Checked' },
+]
+
+function AnimatedNumber({ number, suffix }: { number: number; suffix: string }) {
   const numRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     if (!numRef.current) return
     const obj = { value: 0 }
     const tween = gsap.to(obj, {
-      value: stat.number,
-      duration: 1.8,
+      value: number,
+      duration: 1.5,
       ease: 'power2.out',
       scrollTrigger: {
         trigger: numRef.current,
@@ -61,25 +29,25 @@ function AnimatedNumber({ stat }: { stat: typeof stats[0] }) {
       },
       onUpdate: () => {
         if (numRef.current) {
-          numRef.current.textContent = Math.floor(obj.value).toLocaleString() + stat.suffix
+          numRef.current.textContent = Math.floor(obj.value).toLocaleString() + suffix
         }
       },
     })
     return () => { tween.kill() }
-  }, [stat.number, stat.suffix])
+  }, [number, suffix])
 
   return (
     <span
       ref={numRef}
-      className="font-display font-medium block"
+      className="font-display font-bold"
       style={{
-        fontSize: 'clamp(36px, 4vw, 64px)',
-        lineHeight: 1,
+        fontSize: 'clamp(40px, 5vw, 72px)',
+        lineHeight: 1.1,
         letterSpacing: '-0.03em',
         color: 'var(--orange)',
       }}
     >
-      0{stat.suffix}
+      0{suffix}
     </span>
   )
 }
@@ -87,28 +55,35 @@ function AnimatedNumber({ stat }: { stat: typeof stats[0] }) {
 export default function StatsBarSection() {
   const sectionRef = useScrollReveal<HTMLDivElement>({
     childSelector: '.stat-item',
-    stagger: 0.1,
+    stagger: 0.12,
   })
 
   return (
-    <section style={{ background: 'var(--beige)' }}>
-      <div ref={sectionRef} className="max-w-[1200px] mx-auto px-6 md:px-12 py-[60px] md:py-[80px]">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-          {stats.map((stat) => (
-            <div key={stat.label} className="stat-item text-center">
-              <AnimatedNumber stat={stat} />
+    <section style={{ background: 'var(--navy)' }}>
+      <div ref={sectionRef} className="max-w-[1200px] mx-auto px-6 md:px-12 py-[50px] md:py-[60px]">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0">
+          {stats.map((stat, index) => (
+            <div
+              key={stat.label}
+              className="stat-item text-center relative flex flex-col items-center justify-center py-4"
+            >
+              <AnimatedNumber number={stat.number} suffix={stat.suffix} />
               <p
-                className="font-display text-[16px] font-medium mt-2"
-                style={{ color: 'var(--navy)' }}
+                className="font-display text-[17px] font-medium mt-2 tracking-wide"
+                style={{ color: 'rgba(255,255,255,0.9)' }}
               >
                 {stat.label}
               </p>
-              <p
-                className="font-body text-[13px] mt-1"
-                style={{ color: 'var(--navy-60)' }}
-              >
-                {stat.description}
+              <p className="font-body text-[14px] mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                {stat.sub}
               </p>
+
+              {index < stats.length - 1 && (
+                <div
+                  className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-[60%]"
+                  style={{ background: 'rgba(255,255,255,0.15)' }}
+                />
+              )}
             </div>
           ))}
         </div>
