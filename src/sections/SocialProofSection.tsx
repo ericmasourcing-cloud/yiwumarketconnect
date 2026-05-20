@@ -214,10 +214,11 @@ export default function SocialProofSection() {
               Get the Free Guide
             </p>
             <p className="font-body text-[14px] mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              Sent to your email in seconds
+              The complete beginner's roadmap
             </p>
             <a
-              href="#contact"
+              href="/yiwu-market-guide.pdf"
+              download
               className="inline-flex items-center justify-center font-display text-[16px] font-medium px-8 py-[14px] rounded-xl text-white transition-all duration-300 mt-6 w-full max-w-[280px]"
               style={{ background: 'var(--orange)' }}
               onMouseEnter={(e) => {
@@ -231,10 +232,10 @@ export default function SocialProofSection() {
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              Download Free Guide →
+              Download Free PDF →
             </a>
             <p className="font-body text-[12px] mt-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              No spam. Unsubscribe anytime.
+              17 pages · Instant download · No signup required
             </p>
           </div>
         </div>
