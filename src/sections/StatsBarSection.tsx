@@ -47,7 +47,7 @@ function AnimatedNumber({ number, suffix }: { number: number; suffix: string }) 
         color: 'var(--orange)',
       }}
     >
-      0{suffix}
+      {number.toLocaleString()}{suffix}
     </span>
   )
 }
