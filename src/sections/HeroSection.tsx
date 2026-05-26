@@ -97,7 +97,7 @@ export default function HeroSection({ onHeroVisible }: HeroSectionProps) {
 
         {/* Headline */}
         <div ref={headlineRef} className="space-y-0">
-          <div
+          <h1
             className="headline-line font-display font-medium opacity-0"
             style={{
               fontSize: 'clamp(40px, 5vw, 72px)',
@@ -108,8 +108,8 @@ export default function HeroSection({ onHeroVisible }: HeroSectionProps) {
             }}
           >
             Your Eyes &
-          </div>
-          <div
+          </h1>
+          <h1
             className="headline-line font-display font-medium opacity-0"
             style={{
               fontSize: 'clamp(40px, 5vw, 72px)',
@@ -120,8 +120,8 @@ export default function HeroSection({ onHeroVisible }: HeroSectionProps) {
             }}
           >
             Hands in
-          </div>
-          <div
+          </h1>
+          <h1
             className="headline-line font-display font-medium opacity-0"
             style={{
               fontSize: 'clamp(40px, 5vw, 72px)',
@@ -132,7 +132,7 @@ export default function HeroSection({ onHeroVisible }: HeroSectionProps) {
             }}
           >
             Yiwu Market
-          </div>
+          </h1>
         </div>
 
         {/* Subheadline */}
