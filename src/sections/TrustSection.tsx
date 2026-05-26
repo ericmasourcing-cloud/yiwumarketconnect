@@ -1,4 +1,4 @@
-import { Shield, Camera, Headphones, Clock, User } from 'lucide-react'
+import { Shield, Camera, Headphones, Clock } from 'lucide-react'
 import SectionLabel from '@/components/SectionLabel'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
@@ -63,11 +63,12 @@ export default function TrustSection() {
           ref={aboutRef}
           className="max-w-[800px] mx-auto mt-16 flex flex-col md:flex-row items-center gap-8"
         >
-          <div
-            className="w-[120px] h-[120px] rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: 'var(--beige)' }}
-          >
-            <User size={48} style={{ color: 'var(--navy-40)' }} />
+          <div className="w-[160px] h-[160px] rounded-full overflow-hidden flex-shrink-0 border-4 shadow-lg" style={{ borderColor: 'var(--orange-40)' }}>
+            <img
+              src="/eric-profile.jpg"
+              alt="Eric Ma - Yiwu Sourcing Agent with clients at Yiwu Market"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
             <h4 className="font-display text-[24px] font-medium" style={{ color: 'var(--navy)' }}>
