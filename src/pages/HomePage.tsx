@@ -6,12 +6,6 @@ import HeroSection from '@/sections/HeroSection'
 import StatsBarSection from '@/sections/StatsBarSection'
 import WhyYiwuSection from '@/sections/WhyYiwuSection'
 import ServicesSection from '@/sections/ServicesSection'
-import CategoriesSection from '@/sections/CategoriesSection'
-import HowItWorksSection from '@/sections/HowItWorksSection'
-import TrustSection from '@/sections/TrustSection'
-import SocialProofSection from '@/sections/SocialProofSection'
-import FAQSection from '@/sections/FAQSection'
-import InquiryFormSection from '@/sections/InquiryFormSection'
 import ContactCTASection from '@/sections/ContactCTASection'
 
 export default function HomePage() {
@@ -30,12 +24,6 @@ export default function HomePage() {
         <StatsBarSection />
         <WhyYiwuSection />
         <ServicesSection />
-        <HowItWorksSection />
-        <CategoriesSection />
-        <TrustSection />
-        <SocialProofSection />
-        <FAQSection />
-        <InquiryFormSection />
         <ContactCTASection />
       </main>
       <Footer />
