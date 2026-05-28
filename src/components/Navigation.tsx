@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
 import { useActiveSection } from '@/hooks/useActiveSection'
 
 const NAV_LINKS = [
@@ -11,10 +12,17 @@ const NAV_LINKS = [
   { label: 'Contact', href: '#contact' },
 ]
 
+const BLOG_LINK = {
+  label: 'Blog',
+  href: '/blog/how-to-find-yiwu-sourcing-agent-small-orders',
+}
+
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const activeSection = useActiveSection()
+  const location = useLocation()
+  const isHomePage = location.pathname === '/'
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 100)
@@ -45,18 +53,25 @@ export default function Navigation() {
       >
         <div className="max-w-[1200px] mx-auto flex items-center justify-between h-[72px] md:h-[72px] px-6 md:px-12">
           {/* Logo */}
-          <a href="#" className="font-display text-[20px] font-medium tracking-[-0.01em]" style={{ color: 'var(--navy)' }}>
+          <Link to="/" className="font-display text-[20px] font-medium tracking-[-0.01em]" style={{ color: 'var(--navy)' }}>
             YiwuMarket<span style={{ color: 'var(--orange)' }}>Connect</span>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map((link) => {
               const isActive = activeSection === link.href.replace('#', '')
+              const navHref = isHomePage ? link.href : `/${link.href}`
               return (
-                <button
+                <a
                   key={link.href}
-                  onClick={() => handleNavClick(link.href)}
+                  href={navHref}
+                  onClick={(e) => {
+                    if (isHomePage) {
+                      e.preventDefault()
+                      handleNavClick(link.href)
+                    }
+                  }}
                   className="relative font-display text-[15px] font-medium transition-colors duration-300"
                   style={{ color: isActive ? 'var(--navy)' : 'rgba(10, 37, 64, 0.6)' }}
                 >
@@ -67,15 +82,32 @@ export default function Navigation() {
                       style={{ background: 'var(--orange)' }}
                     />
                   )}
-                </button>
+                </a>
               )
             })}
-            <button
-              onClick={() => handleNavClick('#contact')}
-              className="font-display text-[16px] font-medium px-6 py-3 rounded-xl text-white transition-all duration-300 hover:-translate-y-[1px]"
-              style={{
-                background: 'var(--orange)',
+            <Link
+              to={BLOG_LINK.href}
+              className="relative font-display text-[15px] font-medium transition-colors duration-300"
+              style={{ color: location.pathname.startsWith('/blog') ? 'var(--navy)' : 'rgba(10, 37, 64, 0.6)' }}
+            >
+              {BLOG_LINK.label}
+              {location.pathname.startsWith('/blog') && (
+                <span
+                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[6px] h-[6px] rounded-full"
+                  style={{ background: 'var(--orange)' }}
+                />
+              )}
+            </Link>
+            <a
+              href={isHomePage ? '#contact' : '/#contact'}
+              onClick={(e) => {
+                if (isHomePage) {
+                  e.preventDefault()
+                  handleNavClick('#contact')
+                }
               }}
+              className="font-display text-[16px] font-medium px-6 py-3 rounded-xl text-white transition-all duration-300 hover:-translate-y-[1px]"
+              style={{ background: 'var(--orange)' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#E55A2B'
                 e.currentTarget.style.boxShadow = '0 4px 16px rgba(255, 107, 53, 0.3)'
@@ -86,7 +118,7 @@ export default function Navigation() {
               }}
             >
               Get a Quote
-            </button>
+            </a>
           </div>
 
           {/* Mobile Hamburger */}
@@ -110,22 +142,44 @@ export default function Navigation() {
       >
         <div className="flex flex-col items-center justify-center h-full gap-8 pt-20">
           {NAV_LINKS.map((link) => (
-            <button
+            <a
               key={link.href}
-              onClick={() => handleNavClick(link.href)}
+              href={isHomePage ? link.href : `/${link.href}`}
+              onClick={(e) => {
+                setMenuOpen(false)
+                if (isHomePage) {
+                  e.preventDefault()
+                  handleNavClick(link.href)
+                }
+              }}
               className="font-display text-[28px] font-medium"
               style={{ color: 'var(--navy)' }}
             >
               {link.label}
-            </button>
+            </a>
           ))}
-          <button
-            onClick={() => handleNavClick('#contact')}
+          <Link
+            to={BLOG_LINK.href}
+            onClick={() => setMenuOpen(false)}
+            className="font-display text-[28px] font-medium"
+            style={{ color: location.pathname.startsWith('/blog') ? 'var(--orange)' : 'var(--navy)' }}
+          >
+            {BLOG_LINK.label}
+          </Link>
+          <a
+            href={isHomePage ? '#contact' : '/#contact'}
+            onClick={(e) => {
+              setMenuOpen(false)
+              if (isHomePage) {
+                e.preventDefault()
+                handleNavClick('#contact')
+              }
+            }}
             className="mt-4 font-display text-[18px] font-medium px-8 py-4 rounded-xl text-white"
             style={{ background: 'var(--orange)' }}
           >
             Get a Quote
-          </button>
+          </a>
         </div>
       </div>
     </>
