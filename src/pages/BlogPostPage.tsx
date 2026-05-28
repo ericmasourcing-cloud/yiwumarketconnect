@@ -215,7 +215,7 @@ export default function BlogPostPage() {
 
   useEffect(() => {
     if (post) {
-      document.title = `${post.title} | YiwuMarketConnect Blog`
+      document.title = `${post.title}`
       const metaDesc = document.querySelector('meta[name="description"]')
       if (metaDesc) metaDesc.setAttribute('content', post.description)
     }

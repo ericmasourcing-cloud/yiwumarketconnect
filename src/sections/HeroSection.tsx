@@ -107,31 +107,9 @@ export default function HeroSection({ onHeroVisible }: HeroSectionProps) {
               clipPath: 'inset(0 100% 0 0)',
             }}
           >
-            Your Eyes &
-          </h1>
-          <h1
-            className="headline-line font-display font-medium opacity-0"
-            style={{
-              fontSize: 'clamp(40px, 5vw, 72px)',
-              lineHeight: 1.05,
-              letterSpacing: '-0.025em',
-              color: 'var(--navy)',
-              clipPath: 'inset(0 100% 0 0)',
-            }}
-          >
-            Hands in
-          </h1>
-          <h1
-            className="headline-line font-display font-medium opacity-0"
-            style={{
-              fontSize: 'clamp(40px, 5vw, 72px)',
-              lineHeight: 1.05,
-              letterSpacing: '-0.025em',
-              color: 'var(--orange)',
-              clipPath: 'inset(0 100% 0 0)',
-            }}
-          >
-            Yiwu Market
+            <span style={{ color: 'var(--navy)' }}>Your Eyes &<br /></span>
+            <span style={{ color: 'var(--navy)' }}>Hands in<br /></span>
+            <span style={{ color: 'var(--orange)' }}>Yiwu Market</span>
           </h1>
         </div>
 
