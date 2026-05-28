@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.ericyiwusourcing.com/</loc>
-    <lastmod>2026-05-19</lastmod>
+    <lastmod>2026-05-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -46,5 +47,12 @@
       <image:title>Sports &amp; Outdoor - Yiwu Sourcing</image:title>
       <image:caption>Fitness gear, outdoor tools, camping accessories from Yiwu Market</image:caption>
     </image:image>
+  </url>
+  <url>
+    <loc>https://www.ericyiwusourcing.com/blog/how-to-find-yiwu-sourcing-agent-small-orders</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ericyiwusourcing.com/blog/how-to-find-yiwu-sourcing-agent-small-orders" />
   </url>
 </urlset>
