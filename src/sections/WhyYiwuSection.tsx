@@ -20,8 +20,8 @@ const stats = [
     description: 'More SKUs than most online marketplaces — and you can touch them all.',
   },
   {
-    number: 14,
-    suffix: 'M m²',
+    number: 14000000,
+    suffix: ' m²',
     label: 'Market Space',
     description: 'Five massive districts. I walk them every week so you don\'t have to.',
   },
@@ -67,11 +67,11 @@ function StatCard({ stat }: { stat: typeof stats[0] }) {
     >
       <span
         ref={numberRef}
-        className="font-display font-medium block"
+        className="font-display font-medium block whitespace-nowrap"
         style={{
-          fontSize: 'clamp(48px, 4vw, 96px)',
-          lineHeight: 1,
-          letterSpacing: '-0.03em',
+          fontSize: 'clamp(28px, 3.2vw, 64px)',
+          lineHeight: 1.1,
+          letterSpacing: '-0.02em',
           color: 'var(--orange)',
         }}
       >
