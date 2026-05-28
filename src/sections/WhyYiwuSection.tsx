@@ -20,8 +20,8 @@ const stats = [
     description: 'More SKUs than most online marketplaces — and you can touch them all.',
   },
   {
-    number: 14000000,
-    suffix: '㎡',
+    number: 14,
+    suffix: 'M m²',
     label: 'Market Space',
     description: 'Five massive districts. I walk them every week so you don\'t have to.',
   },
