@@ -6,6 +6,13 @@ import { Calendar, Clock, ArrowRight } from 'lucide-react'
 
 const blogPosts = [
   {
+    slug: 'cost-to-import-small-order-from-china',
+    title: 'How Much Does It Really Cost to Import a Small Order from China? (Complete 2026 Breakdown)',
+    date: 'June 1, 2026',
+    readTime: '12 min read',
+    excerpt: 'Complete cost breakdown for importing small orders from China in 2026. Product cost, shipping, customs duty, VAT, agent fees, and hidden costs — with real numbers and examples.',
+  },
+  {
     slug: 'how-to-find-yiwu-sourcing-agent-small-orders',
     title: 'How to Find a Reliable Yiwu Sourcing Agent for Small Orders (Under $5,000)',
     date: 'May 26, 2026',
