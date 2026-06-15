@@ -23,9 +23,9 @@ const blogPosts = [
 
 export default function BlogPage() {
   useEffect(() => {
-    document.title = 'Blog | YiwuMarketConnect'
+    document.title = 'Blog | Yiwu Event Supplies'
     return () => {
-      document.title = 'Yiwu Sourcing Agent | Eric — Low MOQ Product Sourcing for Small Business'
+      document.title = 'Yiwu Event & Seasonal Supplies Wholesale for Saudi Buyers'
     }
   }, [])
 
@@ -36,8 +36,8 @@ export default function BlogPage() {
       {/* Header */}
       <section className="pt-[120px] pb-[40px]" style={{ background: 'var(--navy)' }}>
         <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-          <p className="font-body text-[14px] mb-3" style={{ color: 'var(--orange)' }}>
-            YIWUMARKETCONNECT BLOG
+          <p className="font-body text-[14px] mb-3" style={{ color: 'var(--gold)' }}>
+            YIWU EVENT SUPPLIES BLOG
           </p>
           <h1
             className="font-display font-medium text-white"
@@ -50,7 +50,7 @@ export default function BlogPage() {
             Sourcing Tips & Market Insights
           </h1>
           <p className="font-body text-[18px] mt-4 max-w-[600px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
-            Practical guides for importing from China, straight from someone who walks Yiwu Market 5 days a week.
+            Practical guides for importing event supplies from China, straight from someone who walks Yiwu Market every week.
           </p>
         </div>
       </section>
@@ -64,13 +64,13 @@ export default function BlogPage() {
                 key={post.slug}
                 to={`/blog/${post.slug}`}
                 className="group block bg-white rounded-2xl border p-8 transition-all duration-300"
-                style={{ borderColor: 'var(--navy-15)' }}
+                style={{ borderColor: 'var(--navy-8)' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--orange-40)'
+                  e.currentTarget.style.borderColor = 'var(--ksa-green)'
                   e.currentTarget.style.boxShadow = '0 8px 32px rgba(10, 37, 64, 0.08)'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--navy-15)'
+                  e.currentTarget.style.borderColor = 'var(--navy-8)'
                   e.currentTarget.style.boxShadow = 'none'
                 }}
               >
@@ -91,7 +91,7 @@ export default function BlogPage() {
                 <p className="font-body text-[16px] leading-[1.7] mt-4" style={{ color: 'var(--navy-60)' }}>
                   {post.excerpt}
                 </p>
-                <div className="flex items-center gap-2 mt-6 font-display text-[15px] font-medium" style={{ color: 'var(--orange)' }}>
+                <div className="flex items-center gap-2 mt-6 font-display text-[15px] font-medium" style={{ color: 'var(--ksa-green)' }}>
                   Read Article <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </div>
               </Link>

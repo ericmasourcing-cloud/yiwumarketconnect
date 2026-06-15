@@ -1,7 +1,7 @@
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import CategoriesSection from '@/sections/CategoriesSection'
-import ContactCTASection from '@/sections/ContactCTASection'
+import InquirySection from '@/sections/InquirySection'
 
 export default function CategoriesPage() {
   return (
@@ -9,7 +9,7 @@ export default function CategoriesPage() {
       <Navigation />
       <main className="pt-[80px]">
         <CategoriesSection />
-        <ContactCTASection />
+        <InquirySection />
       </main>
       <Footer />
     </div>

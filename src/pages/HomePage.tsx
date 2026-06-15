@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react'
 import Navigation from '@/components/Navigation'
-import FermatSpiral from '@/components/FermatSpiral'
 import Footer from '@/components/Footer'
 import HeroSection from '@/sections/HeroSection'
-import StatsBarSection from '@/sections/StatsBarSection'
-import WhyYiwuSection from '@/sections/WhyYiwuSection'
-import ServicesSection from '@/sections/ServicesSection'
-import ContactCTASection from '@/sections/ContactCTASection'
+import ValuePropsSection from '@/sections/ValuePropsSection'
+import CategoriesSection from '@/sections/CategoriesSection'
+import ProductsSection from '@/sections/ProductsSection'
+import ProcessSection from '@/sections/ProcessSection'
+import InquirySection from '@/sections/InquirySection'
 
 export default function HomePage() {
   const [heroVisible, setHeroVisible] = useState(true)
@@ -17,14 +17,14 @@ export default function HomePage() {
 
   return (
     <div className="relative" style={{ background: 'var(--warm-white)' }}>
-      <FermatSpiral isVisible={heroVisible} />
-      <Navigation />
+      <Navigation heroVisible={heroVisible} />
       <main className="relative z-[1]">
         <HeroSection onHeroVisible={handleHeroVisible} />
-        <StatsBarSection />
-        <WhyYiwuSection />
-        <ServicesSection />
-        <ContactCTASection />
+        <ValuePropsSection />
+        <CategoriesSection />
+        <ProductsSection />
+        <ProcessSection />
+        <InquirySection />
       </main>
       <Footer />
     </div>

@@ -204,7 +204,7 @@ export default function BlogPostPage() {
       if (metaDesc) metaDesc.setAttribute('content', post.description)
     }
     return () => {
-      document.title = 'Yiwu Sourcing Agent | Eric — Low MOQ Product Sourcing for Small Business'
+      document.title = 'Yiwu Event & Seasonal Supplies Wholesale for Saudi Buyers'
     }
   }, [post])
 
