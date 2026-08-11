@@ -3,6 +3,7 @@ import { Menu, X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 const NAV_LINKS = [
+  { label: 'Eric', href: '/eric', exact: true },
   { label: 'Home', href: '/', exact: true },
   { label: 'Categories', href: '/categories' },
   { label: 'Products', href: '/#products' },
