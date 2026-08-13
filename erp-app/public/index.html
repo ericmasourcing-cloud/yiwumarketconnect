@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10271f">
+  <title>航贸云 ERP</title>
+  <link rel="stylesheet" href="/styles.css?v=3">
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <section id="login" class="login-shell">
+    <div class="login-art">
+      <div class="brand-mark">HM</div>
+      <div>
+        <p class="eyebrow">GLOBAL TRADE OPERATING SYSTEM</p>
+        <h1>让每一笔订单<br>都经得起追溯。</h1>
+        <p class="lead">从客户意向到最终利润，把状态、资金、责任和证据连接成一条可靠的业务链。</p>
+      </div>
+      <div class="route-line"><span>询盘</span><i></i><span>履约</span><i></i><span>资金</span><i></i><span>利润</span></div>
+    </div>
+    <form id="login-form" class="login-card">
+      <p class="eyebrow dark">SECURE WORKSPACE</p>
+      <h2>登录航贸云</h2>
+      <p class="muted">使用企业账号进入工作台</p>
+      <label>邮箱<input name="email" type="email" autocomplete="username" value="admin@hangmao.local" required></label>
+      <label>密码<input name="password" type="password" autocomplete="current-password" value="Admin@2026" required></label>
+      <button class="primary" type="submit">进入工作台 <span>→</span></button>
+      <p class="demo-note">演示管理员：admin@hangmao.local / Admin@2026</p>
+    </form>
+  </section>
+
+  <div id="app" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark small">HM</span><div><strong>航贸云</strong><small>Trade OS</small></div></div>
+      <nav id="nav">
+        <button data-view="dashboard" class="active"><span>⌂</span>经营总览</button>
+        <p>销售前台</p>
+        <button data-view="customers"><span>◎</span>客户与跟进</button>
+        <button data-view="quotes"><span>◇</span>报价管理</button>
+        <button data-view="orders"><span>▣</span>销售合同</button>
+        <p>供应与履约</p>
+        <button data-view="products"><span>□</span>产品中心</button>
+        <button data-view="suppliers"><span>△</span>供应商</button>
+        <button data-view="purchases"><span>⌑</span>采购管理</button>
+        <button data-view="deliveries"><span>→</span>出运管理</button>
+        <button data-view="afterSales"><span>!</span>售后与客诉</button>
+        <p>经营控制</p>
+        <button data-view="finance"><span>¥</span>资金与利润</button>
+        <button data-view="shares"><span>%</span>利润与提成</button>
+        <button data-view="approvals"><span>✓</span>审批中心 <b id="approval-badge"></b></button>
+        <button data-view="audit"><span>≡</span>审计日志</button>
+        <button data-view="settings"><span>⚙</span>系统设置</button>
+      </nav>
+      <div class="sidebar-foot"><div id="avatar">管</div><div><strong id="user-name">—</strong><small id="user-role">—</small></div><button id="logout" title="退出">↗</button></div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div><p id="breadcrumb">经营控制台 / 总览</p><h2 id="page-title">经营总览</h2></div>
+        <div class="top-actions"><label class="search">⌕ <input id="global-search" placeholder="搜索当前页面"></label><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+
+  <dialog id="modal"><form method="dialog" class="modal-card"><div class="modal-head"><div><p class="eyebrow dark" id="modal-kicker">NEW RECORD</p><h3 id="modal-title">新增</h3></div><button value="cancel" class="close">×</button></div><div id="modal-body"></div><div class="modal-actions"><button value="cancel" class="secondary">取消</button><button id="modal-submit" value="default" class="primary">保存记录</button></div></form></dialog>
+  <script type="module" src="/app.js?v=3"></script>
+</body>
+</html>

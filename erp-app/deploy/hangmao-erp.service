@@ -1,0 +1,24 @@
+[Unit]
+Description=Hangmao Trade ERP
+After=network.target
+
+[Service]
+Type=simple
+User=hangmao
+Group=hangmao
+WorkingDirectory=/opt/hangmao-erp/app
+EnvironmentFile=/etc/hangmao-erp.env
+ExecStart=/usr/bin/node src/server.js
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/hangmao-erp
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
+

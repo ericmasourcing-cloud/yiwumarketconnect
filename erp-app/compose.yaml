@@ -1,0 +1,14 @@
+services:
+  erp:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "4173:4173"
+    environment:
+      ERP_ADMIN_PASSWORD: "${ERP_ADMIN_PASSWORD:?请设置管理员密码}"
+      ERP_SESSION_HOURS: "8"
+    volumes:
+      - erp-data:/var/lib/hangmao
+volumes:
+  erp-data:
+
