@@ -234,6 +234,8 @@ function ensureColumn(table, definition) {
   if (!exists) db.exec(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
 }
 
+for (const definition of ['department TEXT NOT NULL DEFAULT \'业务部\'', 'data_scope TEXT NOT NULL DEFAULT \'company\'']) ensureColumn('users', definition);
+
 for (const definition of [
   'contact_person_name TEXT', 'company_name TEXT', 'whatsapp TEXT', 'source TEXT', 'source_detail TEXT',
   'website TEXT', 'tags TEXT', 'core_needs TEXT', 'project_background TEXT', 'followup_notes TEXT',
@@ -289,12 +291,12 @@ function seed() {
   const password = process.env.ERP_ADMIN_PASSWORD || 'Admin@2026';
   transaction(() => {
     db.prepare('INSERT INTO companies VALUES (?, ?, ?, ?)').run(companyId, '远航国际贸易', 'CNY', createdAt);
-    const insertUser = db.prepare('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, 1, 0, NULL, ?, ?)');
-    insertUser.run(adminId, companyId, 'admin@hangmao.local', '林致远', 'admin', hashPassword(password), createdAt, createdAt);
+    const insertUser = db.prepare(`INSERT INTO users (id,company_id,email,name,role,password_hash,active,failed_attempts,locked_until,created_at,updated_at,department,data_scope) VALUES (?, ?, ?, ?, ?, ?, 1, 0, NULL, ?, ?, ?, ?)`);
+    insertUser.run(adminId, companyId, 'admin@hangmao.local', '林致远', 'admin', hashPassword(password), createdAt, createdAt, '管理层', 'company');
     if (process.env.ERP_DEMO_USERS !== 'false') {
-      insertUser.run('user_sales', companyId, 'sales@hangmao.local', '陈晓岚', 'sales', hashPassword('Sales@2026'), createdAt, createdAt);
-      insertUser.run('user_finance', companyId, 'finance@hangmao.local', '周谨', 'finance', hashPassword('Finance@2026'), createdAt, createdAt);
-      insertUser.run('user_manager', companyId, 'manager@hangmao.local', '顾远川', 'manager', hashPassword('Manager@2026'), createdAt, createdAt);
+      insertUser.run('user_sales', companyId, 'sales@hangmao.local', '陈晓岚', 'sales', hashPassword('Sales@2026'), createdAt, createdAt, '业务部', 'personal');
+      insertUser.run('user_finance', companyId, 'finance@hangmao.local', '周谨', 'finance', hashPassword('Finance@2026'), createdAt, createdAt, '财务部', 'company');
+      insertUser.run('user_manager', companyId, 'manager@hangmao.local', '顾远川', 'manager', hashPassword('Manager@2026'), createdAt, createdAt, '管理层', 'company');
     }
   });
 }

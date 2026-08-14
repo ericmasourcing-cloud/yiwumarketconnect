@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/styles.css?v=3">
   <link rel="stylesheet" href="/password-toggle.css?v=1">
   <link rel="stylesheet" href="/details.css?v=1">
+  <link rel="stylesheet" href="/scope-switch.css?v=1">
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
@@ -65,7 +66,7 @@
     <main>
       <header class="topbar">
         <div><p id="breadcrumb">经营控制台 / 总览</p><h2 id="page-title">经营总览</h2></div>
-        <div class="top-actions"><label class="search">⌕ <input id="global-search" placeholder="搜索当前页面"></label><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
+        <div class="top-actions"><label class="scope-switch">数据范围 <select id="data-scope"><option value="personal">个人</option><option value="department">部门</option><option value="company">全公司</option></select></label><label class="search">⌕ <input id="global-search" placeholder="搜索当前页面"></label><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
       </header>
       <section id="content" class="content"></section>
     </main>
@@ -73,6 +74,6 @@
 
   <dialog id="modal"><form method="dialog" class="modal-card"><div class="modal-head"><div><p class="eyebrow dark" id="modal-kicker">NEW RECORD</p><h3 id="modal-title">新增</h3></div><button value="cancel" class="close">×</button></div><div id="modal-body"></div><div class="modal-actions"><button value="cancel" class="secondary">取消</button><button id="modal-submit" value="default" class="primary">保存记录</button></div></form></dialog>
   <dialog id="detail-drawer" class="detail-dialog"><div class="detail-card"><div class="detail-head"><div><p class="eyebrow dark" id="detail-kicker">BUSINESS RECORD</p><h3 id="detail-title">业务详情</h3></div><button id="detail-close" class="close" type="button">×</button></div><div id="detail-body"></div></div></dialog>
-  <script type="module" src="/app.js?v=4"></script>
+  <script type="module" src="/app.js?v=5"></script>
 </body>
 </html>

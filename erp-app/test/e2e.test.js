@@ -38,6 +38,7 @@ before(async () => {
   child = spawn(process.execPath, ['src/server.js'], { cwd: process.cwd(), env: { ...process.env, PORT: String(port), ERP_DATA_DIR: dataDir }, stdio: 'ignore' });
   await waitForServer();
 });
+
 after(() => { child?.kill(); rmSync(dataDir, { recursive: true, force: true }); });
 
 test('未登录不能读取经营数据', async () => {
@@ -406,4 +407,37 @@ test('核心业务链与职责分离', async () => {
   const directEffective = await request(admin, `/api/orders/${directOrder.data.id}`);
   assert.equal(directEffective.data.order.document_status, 'effective');
   assert.equal(directEffective.data.finance[0].type, 'receivable');
+});
+
+test('个人与部门数据范围由服务端隔离', async () => {
+  const admin=await login('admin@hangmao.local','Safer-Admin@2026');
+  const sales=await login('sales@hangmao.local','Sales@2026');
+  const adminCustomers=await request(admin,'/api/customers');
+  assert.ok(adminCustomers.data.length>0);
+  const hiddenCustomer=adminCustomers.data[0];
+  const me=await request(sales,'/api/me');
+  assert.equal(me.data.user.dataScope,'personal');
+  const personalCustomers=await request(sales,'/api/customers');
+  assert.equal(personalCustomers.data.length,0);
+  const hiddenDetail=await request(sales,`/api/customers/${hiddenCustomer.id}`);
+  assert.equal(hiddenDetail.status,404);
+  const hiddenQuote=await request(sales,'/api/quotes','POST',{customerId:hiddenCustomer.id,currency:'USD',exchangeRate:7.2,items:[{description:'越权报价',quantity:1,unitPrice:10,unitCost:8}]});
+  assert.equal(hiddenQuote.status,404);
+  const attachment=await request(admin,'/api/attachments','POST',{objectType:'customer',objectId:hiddenCustomer.id,fileName:'scope-proof.txt',mimeType:'text/plain',dataBase64:Buffer.from('scope proof').toString('base64')});
+  assert.equal(attachment.status,201);
+  const hiddenAttachments=await request(sales,`/api/attachments?objectType=customer&objectId=${hiddenCustomer.id}`);
+  assert.equal(hiddenAttachments.status,404);
+  const ownCustomer=await request(sales,'/api/customers','POST',{name:'Sales Personal Customer',country:'法国',email:'sales-customer@example.com'});
+  assert.equal(ownCustomer.status,201);
+  const personalList=await request(sales,'/api/customers');
+  assert.deepEqual(personalList.data.map(row=>row.id),[ownCustomer.data.id]);
+  const personalDashboard=await request(sales,'/api/dashboard');
+  assert.equal(personalDashboard.data.metrics.customers,1);
+  const departmentScope=await request(sales,'/api/me/scope','PUT',{scope:'department'});
+  assert.equal(departmentScope.status,200);
+  const departmentCustomers=await request(sales,'/api/customers');
+  assert.equal(departmentCustomers.data.some(row=>row.id===hiddenCustomer.id),false);
+  assert.equal(departmentCustomers.data.some(row=>row.id===ownCustomer.data.id),true);
+  const forbiddenCompanyScope=await request(sales,'/api/me/scope','PUT',{scope:'company'});
+  assert.equal(forbiddenCompanyScope.status,403);
 });
