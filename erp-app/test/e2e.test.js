@@ -50,6 +50,8 @@ test('核心业务链与职责分离', async () => {
   assert.equal(updatedSetting.status, 200);
   const newUser = await request(admin, '/api/users', 'POST', { name: '测试运营', email: 'ops-test@hangmao.local', role: 'operations', password: 'Operations@2026' });
   assert.equal(newUser.status, 201);
+  const operations = await login('ops-test@hangmao.local', 'Operations@2026');
+  const finance = await login('finance@hangmao.local', 'Finance@2026');
 
   const supplier = await request(admin, '/api/suppliers', 'POST', { name: '宁波精工制造', country: '中国', contactName: '王工', phone: '13800000000', wechat: 'nb-jinggong', shopUrl: 'https://example.com/store', address: '宁波市北仑区', mainCategories: '户外照明,小家电', taxNo: '91330200TEST', bankName: '中国银行宁波分行', bankAccount: '6222-TEST', paymentTerms: '30% 定金，70% 出货前', cooperationNotes: '交期稳定，包装需抽检', riskLevel: 'low' });
   assert.equal(supplier.status, 201);
@@ -88,21 +90,57 @@ test('核心业务链与职责分离', async () => {
   assert.equal(selfDecision.status, 403);
   const decision = await request(manager, `/api/approvals/${approval.id}/decision`, 'POST', { decision: 'approved', note: '成本证据完整，同意执行' });
   assert.equal(decision.status, 200);
+  const withdrawQuote = await request(admin, '/api/quotes', 'POST', { customerId: customer.data.id, currency: 'USD', exchangeRate: 7.2, incoterm: 'FOB', validUntil: '2026-09-02', items: [{ productId: product.data.id, description: '撤回测试报价', quantity: 10, unitPrice: 10, unitCost: 9 }] });
+  await request(admin, `/api/quotes/${withdrawQuote.data.id}/submit`, 'POST');
+  const withdrawApprovals = await request(admin, '/api/approvals?scope=mine');
+  const withdrawApproval = withdrawApprovals.data.find(item => item.object_id === withdrawQuote.data.id);
+  const withdrawn = await request(admin, `/api/approvals/${withdrawApproval.id}/withdraw`, 'POST');
+  assert.equal(withdrawn.status, 200);
+  const withdrawnQuoteDetail = await request(admin, `/api/quotes/${withdrawQuote.data.id}`);
+  assert.equal(withdrawnQuoteDetail.data.quote.status, 'draft');
 
   const converted = await request(admin, `/api/quotes/${quote.data.id}/convert`, 'POST');
   assert.equal(converted.status, 201);
+  const draftOrder = await request(admin, `/api/orders/${converted.data.id}`);
+  assert.equal(draftOrder.data.order.document_status, 'draft');
+  assert.equal(draftOrder.data.finance.length, 0);
+  const orderSubmitted = await request(admin, `/api/orders/${converted.data.id}/submit`, 'POST');
+  assert.equal(orderSubmitted.data.status, 'approval_pending');
+  const managerTodo = await request(manager, '/api/approvals?scope=todo');
+  assert.ok(managerTodo.data.some(item => item.object_type === 'sales_order' && item.object_id === converted.data.id));
+  const orderApprovals = await request(admin, '/api/approvals');
+  const orderApproval = orderApprovals.data.find(item => item.object_type === 'sales_order' && item.object_id === converted.data.id);
+  const orderFirstApproval = await request(manager, `/api/approvals/${orderApproval.id}/decision`, 'POST', { decision: 'approved', note: '合同金额及条款核对无误' });
+  assert.equal(orderFirstApproval.data.complete, false);
+  const orderSecondApproval = await request(operations, `/api/approvals/${orderApproval.id}/decision`, 'POST', { decision: 'approved', note: '运营确认可以进入履约' });
+  assert.equal(orderSecondApproval.data.complete, true);
   const orderDetail = await request(admin, `/api/orders/${converted.data.id}`);
   assert.equal(orderDetail.data.items.length, 1);
   assert.equal(orderDetail.data.finance[0].type, 'receivable');
+  const procurementPending = await request(admin, '/api/procurement/pending');
+  const deliveryPending = await request(admin, '/api/delivery/pending');
+  assert.equal(procurementPending.data[0].remaining_quantity, 1000);
+  assert.equal(deliveryPending.data[0].remaining_quantity, 1000);
 
   const purchase = await request(admin, '/api/purchases', 'POST', { salesOrderId: converted.data.id, supplierId: supplier.data.id, currency: 'USD', orderedAt: '2026-08-14', procurementMethod: 'direct', taxIncluded: true, taxRate: 13, paymentTerms: '30% 定金，70% 出货前', notes: '首批验货后付尾款', expenses: [{ name: '国内运费', category: 'freight', amount: 100 }], items: [{ salesOrderItemId: orderDetail.data.items[0].id, quantity: 600, unitCost: 8.8 }] });
   assert.equal(purchase.status, 201);
   const overPurchase = await request(admin, '/api/purchases', 'POST', { salesOrderId: converted.data.id, supplierId: supplier.data.id, currency: 'USD', items: [{ salesOrderItemId: orderDetail.data.items[0].id, quantity: 500, unitCost: 8.8 }] });
   assert.equal(overPurchase.status, 422);
+  const procurementPendingAfter = await request(admin, '/api/procurement/pending');
+  assert.equal(procurementPendingAfter.data[0].remaining_quantity, 400);
   const purchaseDetail = await request(admin, `/api/purchases/${purchase.data.id}`);
   assert.equal(purchaseDetail.data.items[0].quantity, 600);
   assert.equal(purchaseDetail.data.expenses[0].amount, 100);
-  const purchaseUpdate = await request(admin, `/api/purchases/${purchase.data.id}`, 'PUT', { version: purchaseDetail.data.purchase.version, expectedAt: '2026-09-15', status: 'production', note: '原料已到厂，开始生产' });
+  assert.equal(purchaseDetail.data.purchase.document_status, 'draft');
+  const purchaseSubmitted = await request(admin, `/api/purchases/${purchase.data.id}/submit`, 'POST');
+  assert.equal(purchaseSubmitted.data.status, 'approval_pending');
+  const purchaseApprovals = await request(admin, '/api/approvals');
+  const purchaseApproval = purchaseApprovals.data.find(item => item.object_type === 'purchase_order' && item.object_id === purchase.data.id);
+  await request(manager, `/api/approvals/${purchaseApproval.id}/decision`, 'POST', { decision: 'approved', note: '采购数量与成本合理' });
+  const purchaseFinalApproval = await request(finance, `/api/approvals/${purchaseApproval.id}/decision`, 'POST', { decision: 'approved', note: '财务确认付款口径' });
+  assert.equal(purchaseFinalApproval.data.complete, true);
+  const purchaseApprovedDetail = await request(admin, `/api/purchases/${purchase.data.id}`);
+  const purchaseUpdate = await request(admin, `/api/purchases/${purchase.data.id}`, 'PUT', { version: purchaseApprovedDetail.data.purchase.version, expectedAt: '2026-09-15', status: 'production', note: '原料已到厂，开始生产' });
   assert.equal(purchaseUpdate.status, 200);
 
   const delivery = await request(admin, '/api/deliveries', 'POST', { salesOrderId: converted.data.id, forwarder: '海程国际物流', transportMode: 'sea', currency: 'CNY', freight: 6000, originLocation: '宁波港', incoterm: 'FOB', packageMaterials: '五层瓦楞纸箱 + 托盘', packageCount: 50, grossWeight: 820, volumeCbm: 6.5, notes: '需要拍装柜照片', expenses: [{ name: '进仓费', category: 'warehouse', amount: 200 }], items: [{ salesOrderItemId: orderDetail.data.items[0].id, quantity: 600 }] });
@@ -110,7 +148,16 @@ test('核心业务链与职责分离', async () => {
   const deliveryDetail = await request(admin, `/api/deliveries/${delivery.data.id}`);
   assert.equal(deliveryDetail.data.delivery.package_count, 50);
   assert.equal(deliveryDetail.data.expenses[0].amount, 200);
-  const deliveryUpdate = await request(admin, `/api/deliveries/${delivery.data.id}`, 'PUT', { version: deliveryDetail.data.delivery.version, forwarder: '海程国际物流', transportMode: 'sea', trackingNo: 'HM-SHIP-001', plannedAt: '2026-09-20', shippedAt: '2026-09-21', status: 'arrived', note: '船舶已抵港' });
+  const deliveryPendingAfter = await request(admin, '/api/delivery/pending');
+  assert.equal(deliveryPendingAfter.data[0].remaining_quantity, 400);
+  const deliverySubmitted = await request(admin, `/api/deliveries/${delivery.data.id}/submit`, 'POST');
+  assert.equal(deliverySubmitted.data.status, 'approval_pending');
+  const deliveryApprovals = await request(admin, '/api/approvals');
+  const deliveryApproval = deliveryApprovals.data.find(item => item.object_type === 'delivery_order' && item.object_id === delivery.data.id);
+  await request(manager, `/api/approvals/${deliveryApproval.id}/decision`, 'POST', { decision: 'approved', note: '物流费用和包装资料完整' });
+  await request(operations, `/api/approvals/${deliveryApproval.id}/decision`, 'POST', { decision: 'approved', note: '运营确认订舱资料' });
+  const deliveryApprovedDetail = await request(admin, `/api/deliveries/${delivery.data.id}`);
+  const deliveryUpdate = await request(admin, `/api/deliveries/${delivery.data.id}`, 'PUT', { version: deliveryApprovedDetail.data.delivery.version, forwarder: '海程国际物流', transportMode: 'sea', trackingNo: 'HM-SHIP-001', plannedAt: '2026-09-20', shippedAt: '2026-09-21', status: 'arrived', note: '船舶已抵港' });
   assert.equal(deliveryUpdate.status, 200);
   const workbench = await request(admin, '/api/finance/workbench');
   const receivableSchedule = workbench.data.receivables.find(item => item.object_id === converted.data.id);
@@ -141,10 +188,8 @@ test('核心业务链与职责分离', async () => {
   const shareApprovals = await request(admin, '/api/approvals');
   const shareApproval = shareApprovals.data.find(item => item.object_id === share.data.id);
   assert.equal(shareApproval.total_steps, 2);
-  const operations = await login('ops-test@hangmao.local', 'Operations@2026');
   const firstStep = await request(operations, `/api/approvals/${shareApproval.id}/decision`, 'POST', { decision: 'approved', note: '运营确认业绩归属' });
   assert.deepEqual(firstStep.data, { ok: true, complete: false });
-  const finance = await login('finance@hangmao.local', 'Finance@2026');
   const secondStep = await request(finance, `/api/approvals/${shareApproval.id}/decision`, 'POST', { decision: 'approved', note: '财务复核利润口径' });
   assert.deepEqual(secondStep.data, { ok: true, complete: true });
 

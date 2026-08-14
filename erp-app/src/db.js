@@ -213,20 +213,22 @@ for (const definition of [
 ]) ensureColumn('customers', definition);
 for (const definition of [
   'wechat TEXT', 'shop_url TEXT', 'address TEXT', 'main_categories TEXT', 'tax_no TEXT',
-  'bank_name TEXT', 'bank_account TEXT', 'payment_terms TEXT', 'cooperation_notes TEXT'
+  'bank_name TEXT', 'bank_account TEXT', 'payment_terms TEXT', 'cooperation_notes TEXT',
+  'document_status TEXT NOT NULL DEFAULT \'effective\''
 ]) ensureColumn('suppliers', definition);
 for (const definition of [
-  'specifications TEXT', 'image_url TEXT', 'qr_code TEXT', 'notes TEXT'
+  'specifications TEXT', 'image_url TEXT', 'qr_code TEXT', 'notes TEXT', 'document_status TEXT NOT NULL DEFAULT \'effective\''
 ]) ensureColumn('products', definition);
-for (const definition of ['notes TEXT', 'delivery_at TEXT']) ensureColumn('quotes', definition);
-for (const definition of ['incoterm TEXT', 'payment_terms TEXT', 'delivery_at TEXT', 'notes TEXT']) ensureColumn('sales_orders', definition);
+for (const definition of ['notes TEXT', 'delivery_at TEXT', 'document_status TEXT NOT NULL DEFAULT \'effective\'']) ensureColumn('quotes', definition);
+for (const definition of ['incoterm TEXT', 'payment_terms TEXT', 'delivery_at TEXT', 'notes TEXT', 'document_status TEXT NOT NULL DEFAULT \'effective\'']) ensureColumn('sales_orders', definition);
 for (const definition of [
   'ordered_at TEXT', 'procurement_method TEXT', 'tax_included INTEGER NOT NULL DEFAULT 0',
-  'tax_rate REAL NOT NULL DEFAULT 0', 'payment_terms TEXT', 'notes TEXT', 'closed_remaining_reason TEXT'
+  'tax_rate REAL NOT NULL DEFAULT 0', 'payment_terms TEXT', 'notes TEXT', 'closed_remaining_reason TEXT',
+  'document_status TEXT NOT NULL DEFAULT \'effective\''
 ]) ensureColumn('purchase_orders', definition);
 for (const definition of [
   'origin_location TEXT', 'incoterm TEXT', 'notes TEXT', 'package_materials TEXT', 'package_count INTEGER',
-  'gross_weight REAL', 'volume_cbm REAL', 'closed_remaining_reason TEXT'
+  'gross_weight REAL', 'volume_cbm REAL', 'closed_remaining_reason TEXT', 'document_status TEXT NOT NULL DEFAULT \'effective\''
 ]) ensureColumn('delivery_orders', definition);
 for (const definition of ['payment_channel TEXT', 'other_channel TEXT', 'note TEXT']) ensureColumn('finance_entries', definition);
 

@@ -3,6 +3,7 @@ async function login(email,password){const r=await fetch(`${base}/api/auth/login
 async function api(s,path,method='GET',data){const r=await fetch(base+path,{method,headers:{cookie:s.cookie,'x-csrf-token':s.csrf,'content-type':'application/json'},body:data?JSON.stringify(data):undefined});const d=await r.json();if(!r.ok)throw new Error(`${path}: ${d.error}`);return d}
 const admin=await login('admin@hangmao.local','Admin@2026');
 const manager=await login('manager@hangmao.local','Manager@2026');
+const finance=await login('finance@hangmao.local','Finance@2026');
 const current=await api(admin,'/api/customers');
 if(current.some(c=>c.name==='Nordlicht Outdoor GmbH')){console.log('演示数据已存在，未重复导入');process.exit(0)}
 const supplier=await api(admin,'/api/suppliers','POST',{name:'宁波拓野户外用品有限公司',country:'中国',contactName:'王海',email:'sales@tuoye.example',riskLevel:'low'});
@@ -14,9 +15,10 @@ const q2=await api(admin,'/api/quotes','POST',{customerId:customer.id,currency:'
 await api(admin,`/api/quotes/${q2.id}/submit`,'POST');
 const approvals=await api(manager,'/api/approvals');const approval=approvals.find(a=>a.object_id===q2.id);await api(manager,`/api/approvals/${approval.id}/decision`,'POST',{decision:'approved',note:'礼盒订单具有战略意义，成本凭证与回款条件完整'});
 const so=await api(admin,`/api/quotes/${quote.id}/convert`,'POST');
+await api(admin,`/api/orders/${so.id}/submit`,'POST');
+const soApprovals=await api(manager,'/api/approvals');const soApproval=soApprovals.find(a=>a.object_type==='sales_order'&&a.object_id===so.id);await api(manager,`/api/approvals/${soApproval.id}/decision`,'POST',{decision:'approved',note:'合同金额和条款核对通过'});await api(manager,`/api/approvals/${soApproval.id}/decision`,'POST',{decision:'approved',note:'运营环节确认可以履约'});
 const detail=await api(admin,`/api/orders/${so.id}`);const item=detail.items[0];
-await api(admin,'/api/purchases','POST',{salesOrderId:so.id,supplierId:supplier.id,currency:'USD',expectedAt:'2026-09-05',items:[{salesOrderItemId:item.id,quantity:1200,unitCost:9.2}]});
-await api(admin,'/api/deliveries','POST',{salesOrderId:so.id,forwarder:'海程国际物流',transportMode:'sea',trackingNo:'COSU-DEMO-2026',freight:8600,currency:'CNY',plannedAt:'2026-09-10',items:[{salesOrderItemId:item.id,quantity:800}]});
+const po=await api(admin,'/api/purchases','POST',{salesOrderId:so.id,supplierId:supplier.id,currency:'USD',expectedAt:'2026-09-05',items:[{salesOrderItemId:item.id,quantity:1200,unitCost:9.2}]});await api(admin,`/api/purchases/${po.id}/submit`,'POST');const poApprovals=await api(manager,'/api/approvals');const poApproval=poApprovals.find(a=>a.object_type==='purchase_order'&&a.object_id===po.id);await api(manager,`/api/approvals/${poApproval.id}/decision`,'POST',{decision:'approved',note:'采购数量和成本核对通过'});await api(finance,`/api/approvals/${poApproval.id}/decision`,'POST',{decision:'approved',note:'付款口径确认'});
+const delivery=await api(admin,'/api/deliveries','POST',{salesOrderId:so.id,forwarder:'海程国际物流',transportMode:'sea',trackingNo:'COSU-DEMO-2026',freight:8600,currency:'CNY',plannedAt:'2026-09-10',items:[{salesOrderItemId:item.id,quantity:800}]});await api(admin,`/api/deliveries/${delivery.id}/submit`,'POST');const deliveryApprovals=await api(manager,'/api/approvals');const deliveryApproval=deliveryApprovals.find(a=>a.object_type==='delivery_order'&&a.object_id===delivery.id);await api(manager,`/api/approvals/${deliveryApproval.id}/decision`,'POST',{decision:'approved',note:'物流费用与包装信息完整'});await api(manager,`/api/approvals/${deliveryApproval.id}/decision`,'POST',{decision:'approved',note:'运营确认订舱资料'});
 await api(admin,'/api/finance','POST',{salesOrderId:so.id,type:'receipt',currency:'USD',amount:6900,exchangeRate:7.18,occurredAt:'2026-08-13',reference:'HSBC-DEMO-0831'});
 console.log('演示数据导入完成：客户、产品、供应商、2份报价、1份合同、采购、出运、收款和审批');
-
