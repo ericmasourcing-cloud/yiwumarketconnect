@@ -183,6 +183,11 @@ CREATE TABLE IF NOT EXISTS saved_views (
   is_default INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
   UNIQUE(user_id, module, name)
 );
+CREATE TABLE IF NOT EXISTS fulfillment_closures (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), process TEXT NOT NULL CHECK(process IN ('procurement','delivery')),
+  sales_order_item_id TEXT NOT NULL REFERENCES sales_order_items(id), quantity REAL NOT NULL CHECK(quantity > 0), reason TEXT NOT NULL,
+  created_by TEXT NOT NULL REFERENCES users(id), created_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS settings (
   company_id TEXT NOT NULL REFERENCES companies(id), key TEXT NOT NULL, value_json TEXT NOT NULL,
   updated_by TEXT NOT NULL REFERENCES users(id), updated_at TEXT NOT NULL, PRIMARY KEY(company_id,key)
@@ -206,6 +211,7 @@ CREATE INDEX IF NOT EXISTS ix_audit_object ON audit_logs(object_type, object_id,
 CREATE INDEX IF NOT EXISTS ix_after_sales_order ON after_sales(sales_order_id, status);
 CREATE INDEX IF NOT EXISTS ix_attachment_object ON attachments(object_type, object_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_saved_views_user ON saved_views(user_id, module, updated_at);
+CREATE INDEX IF NOT EXISTS ix_fulfillment_closure_item ON fulfillment_closures(process, sales_order_item_id, created_at);
 `);
 
 function ensureColumn(table, definition) {
