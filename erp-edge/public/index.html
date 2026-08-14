@@ -7,6 +7,7 @@
   <title>航贸云 ERP</title>
   <link rel="stylesheet" href="/styles.css?v=3">
   <link rel="stylesheet" href="/password-toggle.css?v=1">
+  <link rel="stylesheet" href="/details.css?v=1">
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
@@ -24,15 +25,15 @@
       <p class="eyebrow dark">SECURE WORKSPACE</p>
       <h2>登录航贸云</h2>
       <p class="muted">使用企业账号进入工作台</p>
-      <label>邮箱<input name="email" type="email" autocomplete="username" value="admin@hangmao.local" required></label>
+      <label>邮箱<input name="email" type="email" autocomplete="username" required></label>
       <label>密码
         <span class="password-field">
-          <input id="login-password" name="password" type="password" autocomplete="current-password" value="Admin@2026" required>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
           <button id="password-toggle" class="password-toggle" type="button" aria-label="显示密码" aria-pressed="false">显示</button>
         </span>
       </label>
       <button class="primary" type="submit">进入工作台 <span>→</span></button>
-      <p class="demo-note">演示管理员：admin@hangmao.local / Admin@2026</p>
+      <p class="demo-note">企业内部系统 · 登录行为将记录安全日志</p>
     </form>
   </section>
 
@@ -70,6 +71,7 @@
   </div>
 
   <dialog id="modal"><form method="dialog" class="modal-card"><div class="modal-head"><div><p class="eyebrow dark" id="modal-kicker">NEW RECORD</p><h3 id="modal-title">新增</h3></div><button value="cancel" class="close">×</button></div><div id="modal-body"></div><div class="modal-actions"><button value="cancel" class="secondary">取消</button><button id="modal-submit" value="default" class="primary">保存记录</button></div></form></dialog>
-  <script type="module" src="/app.js?v=3"></script>
+  <dialog id="detail-drawer" class="detail-dialog"><div class="detail-card"><div class="detail-head"><div><p class="eyebrow dark" id="detail-kicker">BUSINESS RECORD</p><h3 id="detail-title">业务详情</h3></div><button id="detail-close" class="close" type="button">×</button></div><div id="detail-body"></div></div></dialog>
+  <script type="module" src="/app.js?v=4"></script>
 </body>
 </html>

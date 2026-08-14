@@ -113,6 +113,17 @@ CREATE TABLE IF NOT EXISTS approvals (
   status TEXT NOT NULL DEFAULT 'pending', requested_by TEXT NOT NULL REFERENCES users(id), assigned_role TEXT NOT NULL,
   decided_by TEXT REFERENCES users(id), decision_note TEXT, created_at TEXT NOT NULL, decided_at TEXT
 );
+CREATE TABLE IF NOT EXISTS approval_steps (
+  id TEXT PRIMARY KEY, approval_id TEXT NOT NULL REFERENCES approvals(id) ON DELETE CASCADE,
+  step_no INTEGER NOT NULL, role TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending',
+  decided_by TEXT REFERENCES users(id), decision_note TEXT, decided_at TEXT,
+  UNIQUE(approval_id, step_no)
+);
+CREATE TABLE IF NOT EXISTS business_events (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), object_type TEXT NOT NULL,
+  object_id TEXT NOT NULL, event_type TEXT NOT NULL, from_status TEXT, to_status TEXT,
+  note TEXT, created_by TEXT NOT NULL REFERENCES users(id), created_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS profit_snapshots (
   id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), sales_order_id TEXT NOT NULL REFERENCES sales_orders(id),
   version INTEGER NOT NULL, revenue_base_minor INTEGER NOT NULL, cost_base_minor INTEGER NOT NULL, refund_base_minor INTEGER NOT NULL,
@@ -148,6 +159,8 @@ CREATE INDEX IF NOT EXISTS ix_quotes_customer ON quotes(customer_id, created_at)
 CREATE INDEX IF NOT EXISTS ix_orders_customer ON sales_orders(customer_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_finance_order ON finance_entries(sales_order_id, type, status);
 CREATE INDEX IF NOT EXISTS ix_approvals_pending ON approvals(status, assigned_role, created_at);
+CREATE INDEX IF NOT EXISTS ix_approval_steps ON approval_steps(approval_id, step_no);
+CREATE INDEX IF NOT EXISTS ix_business_events ON business_events(object_type, object_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_audit_object ON audit_logs(object_type, object_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_after_sales_order ON after_sales(sales_order_id, status);
 CREATE INDEX IF NOT EXISTS ix_attachment_object ON attachments(object_type, object_id, created_at);
