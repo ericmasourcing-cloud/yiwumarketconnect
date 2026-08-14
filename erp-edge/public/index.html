@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/details.css?v=1">
   <link rel="stylesheet" href="/scope-switch.css?v=1">
   <link rel="stylesheet" href="/mobile-approvals.css?v=1">
+  <link rel="stylesheet" href="/assistant-dashboard.css?v=1">
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
@@ -67,7 +68,7 @@
     <main>
       <header class="topbar">
         <div><p id="breadcrumb">经营控制台 / 总览</p><h2 id="page-title">经营总览</h2></div>
-        <div class="top-actions"><label class="scope-switch">数据范围 <select id="data-scope"><option value="personal">个人</option><option value="department">部门</option><option value="company">全公司</option></select></label><label class="search">⌕ <input id="global-search" placeholder="搜索当前页面"></label><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
+        <div class="top-actions"><button id="ask-ai" class="icon-btn ask-ai-button" type="button">✦ Ask AI</button><label class="scope-switch">数据范围 <select id="data-scope"><option value="personal">个人</option><option value="department">部门</option><option value="company">全公司</option></select></label><label class="search">⌕ <input id="global-search" placeholder="搜索当前页面"></label><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
       </header>
       <section id="content" class="content"></section>
     </main>
@@ -75,6 +76,7 @@
 
   <dialog id="modal"><form method="dialog" class="modal-card"><div class="modal-head"><div><p class="eyebrow dark" id="modal-kicker">NEW RECORD</p><h3 id="modal-title">新增</h3></div><button value="cancel" class="close">×</button></div><div id="modal-body"></div><div class="modal-actions"><button value="cancel" class="secondary">取消</button><button id="modal-submit" value="default" class="primary">保存记录</button></div></form></dialog>
   <dialog id="detail-drawer" class="detail-dialog"><div class="detail-card"><div class="detail-head"><div><p class="eyebrow dark" id="detail-kicker">BUSINESS RECORD</p><h3 id="detail-title">业务详情</h3></div><button id="detail-close" class="close" type="button">×</button></div><div id="detail-body"></div></div></dialog>
-  <script type="module" src="/app.js?v=6"></script>
+  <dialog id="assistant-dialog" class="assistant-dialog"><div class="assistant-card"><div class="modal-head"><div><p class="eyebrow dark">OPERATION GUIDE</p><h3>Ask AI 操作助手</h3></div><button id="assistant-close" class="close" type="button">×</button></div><p class="muted">只回答航贸云页面和操作步骤，不执行新增、修改、审批或付款。</p><div id="assistant-answer" class="assistant-answer"><p>例如：如何创建 PI？付款填错了怎么冲正？部门数据范围是什么意思？</p></div><form id="assistant-form"><textarea name="query" maxlength="300" rows="3" required placeholder="输入你的系统操作问题"></textarea><button class="primary" type="submit">发送问题</button></form></div></dialog>
+  <script type="module" src="/app.js?v=7"></script>
 </body>
 </html>

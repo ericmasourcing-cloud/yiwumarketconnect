@@ -165,17 +165,23 @@ function reallocationPreview(user,input) {
   const oldTotalMinor=changes.reduce((n,x)=>n+x.oldAmountMinor,0),newTotalMinor=changes.reduce((n,x)=>n+x.newAmountMinor,0);return {month,changes,summary:{shareCount:changes.length,contractCount:new Set(changes.map(x=>x.salesOrderId)).size,oldTotal:oldTotalMinor/100,newTotal:newTotalMinor/100,delta:(newTotalMinor-oldTotalMinor)/100,peopleBefore:new Set(changes.map(x=>x.oldBeneficiaryId)).size,peopleAfter:new Set(changes.map(x=>x.newBeneficiaryId)).size}};
 }
 
-function dashboard(user) {
+function monthRange(value){const month=/^\d{4}-\d{2}$/.test(String(value||''))?String(value):now().slice(0,7),start=`${month}-01T00:00:00.000Z`,next=new Date(`${start}`);next.setUTCMonth(next.getUTCMonth()+1);return {month,start,end:next.toISOString()};}
+
+function dashboard(user,period) {
   const company = user.company_id;
+  const range=monthRange(period);
   const scalar = (sql, ...params) => db.prepare(sql).get(...params).value;
   const customerScope=scopeFilter(user,'c.owner_id'),orderScope=scopeFilter(user,'so.created_by');
-  const cash=list(`SELECT f.type,f.base_amount_minor FROM finance_entries f JOIN sales_orders so ON so.id=f.sales_order_id WHERE f.company_id=? AND f.status='confirmed'${orderScope.sql}`,[company,...orderScope.params]);
+  const cash=list(`SELECT f.type,f.base_amount_minor FROM finance_entries f JOIN sales_orders so ON so.id=f.sales_order_id WHERE f.company_id=? AND f.status='confirmed' AND f.created_at>=? AND f.created_at<?${orderScope.sql}`,[company,range.start,range.end,...orderScope.params]);
   const revenue=cash.filter(row=>row.type==='receipt').reduce((n,row)=>n+row.base_amount_minor,0),payments=cash.filter(row=>['payment','refund'].includes(row.type)).reduce((n,row)=>n+row.base_amount_minor,0);
   const schedules=[...scheduleRows(user,'receivable'),...scheduleRows(user,'payable')];
   return {
     metrics: {
       customers: scalar(`SELECT COUNT(*) value FROM customers c WHERE c.company_id=? AND c.deleted_at IS NULL${customerScope.sql}`,company,...customerScope.params),
       activeOrders: scalar(`SELECT COUNT(*) value FROM sales_orders so WHERE so.company_id=? AND so.deleted_at IS NULL AND so.status!='closed'${orderScope.sql}`,company,...orderScope.params),
+      newOrders: scalar(`SELECT COUNT(*) value FROM sales_orders so WHERE so.company_id=? AND so.deleted_at IS NULL AND so.created_at>=? AND so.created_at<?${orderScope.sql}`,company,range.start,range.end,...orderScope.params),
+      receivableOutstanding: schedules.filter(row=>row.direction==='receivable').reduce((n,row)=>n+row.baseOutstanding,0),
+      cashPayments: payments/100,
       pendingApprovals: scalar(`SELECT COUNT(*) value FROM approvals WHERE company_id=? AND status='pending'`, company),
       unreadNotifications: scalar(`SELECT COUNT(*) value FROM notifications WHERE company_id=? AND (user_id IS NULL OR user_id=?) AND read_at IS NULL`, company,user.id)
         + scalar(`SELECT COUNT(*) value FROM customers c WHERE c.company_id=? AND c.deleted_at IS NULL AND c.status='active' AND c.next_followup_at<?${customerScope.sql}`,company,now(),...customerScope.params)
@@ -184,8 +190,28 @@ function dashboard(user) {
     },
     pipeline: list(`SELECT c.stage label,COUNT(*) value FROM customers c WHERE c.company_id=? AND c.deleted_at IS NULL${customerScope.sql} GROUP BY c.stage`,[company,...customerScope.params]),
     recentOrders: list(`SELECT so.*,c.name customer_name FROM sales_orders so JOIN customers c ON c.id=so.customer_id WHERE so.company_id=? AND so.deleted_at IS NULL${orderScope.sql} ORDER BY so.created_at DESC LIMIT 6`,[company,...orderScope.params]),
-    pending: list(`SELECT a.*, u.name requester_name FROM approvals a JOIN users u ON u.id=a.requested_by WHERE a.company_id=? AND a.status='pending' ORDER BY a.created_at DESC LIMIT 6`, [company])
+    pending: list(`SELECT a.*, u.name requester_name FROM approvals a JOIN users u ON u.id=a.requested_by WHERE a.company_id=? AND a.status='pending' ORDER BY a.created_at DESC LIMIT 6`, [company]),
+    period:range.month
   };
+}
+
+function assistantReply(query){
+  const q=String(query||'').trim();assert(q&&q.length<=300,400,'请输入 1 至 300 个字的系统操作问题');
+  const rules=[
+    [/客户|跟进|crm/i,{title:'客户与跟进',view:'customers',steps:['进入“客户与跟进”','用国家、等级、阶段或负责人筛选客户','打开客户详情查看报价、合同与业务轨迹','点击“记录跟进”填写结果、下一动作和下次跟进时间']}],
+    [/报价|\bpi\b|毛利/i,{title:'报价与 PI',view:'quotes',steps:['进入“报价管理”并创建报价','选择客户，逐行添加产品、数量、售价和成本','确认汇率、贸易条款、付款条款、交期与费用','检查毛利后提交；低毛利会自动进入审批','生效后可打印 PI 或转为销售合同']}],
+    [/合同|\bso\b/i,{title:'销售合同',view:'orders',steps:['进入“销售合同”','可由已生效 PI 转入，也可直接新建','核对多产品明细、金额、条款和交期后提交审批','审批生效后系统生成应收并进入采购、出运履约']}],
+    [/采购|\bpo\b/i,{title:'采购管理',view:'purchases',steps:['先确认销售合同已经生效','进入“采购管理”查看待采购池','选择合同、供应商和合同明细，填写数量、价格、税率与付款节奏','提交经理和财务审批；通过后生成应付']}],
+    [/出运|发货|物流|\bdo\b/i,{title:'出运管理',view:'deliveries',steps:['先确认销售合同已经生效','进入“出运管理”查看待出运池','填写货代、运输方式、包装、箱数、重量、体积、运费和计划日期','提交经理和运营审批；通过后生成物流应付']}],
+    [/收款|付款|应收|应付|财务|冲正/i,{title:'应收应付',view:'finance',steps:['进入“应收应付”选择待收或待付计划','核对关联 SO、PO、DO 或 PS 与未结金额','填写币种、金额、结算汇率、渠道和凭证号','大额付款需要复核；发现错误使用冲正，不能直接删除流水']}],
+    [/利润|分成|提成|\bps\b/i,{title:'利润与提成',view:'shares',steps:['进入“利润与提成”并选择业务月份','先核对合同实际收入、成本、退款和毛利','按人员填写分配比例或金额并上传/引用证明','提交运营和财务审批；通过后进入待付款']}],
+    [/审批|同意|驳回|撤回/i,{title:'审批中心',view:'approvals',steps:['进入“审批中心”查看“我的待办”','打开审批查看业务摘要、完整资料、附件与节点','填写判断依据后同意或驳回','申请人可在审批完成前撤回，修改业务单据后重新提交']}],
+    [/权限|数据范围|个人|部门|全公司/i,{title:'数据范围',view:'dashboard',steps:['在页面右上角选择个人、部门或全公司范围','个人范围只显示本人负责或创建的数据','部门范围显示同部门在职成员数据','只有获授权角色可以查看全公司数据']}],
+    [/附件|凭证|上传/i,{title:'附件与凭证',view:'notifications',steps:['打开对应客户、单据、审批或财务记录详情','点击“上传附件”选择 PDF、图片、CSV、Word 或 Excel','上传后系统记录文件摘要、上传人和审计日志','下载权限跟随业务记录的数据范围']}]
+  ];
+  const found=rules.find(([pattern])=>pattern.test(q));
+  if(!found)return {inScope:false,title:'仅支持航贸云操作问题',answer:'我只能说明航贸云里的页面、字段和操作步骤，不提供市场判断、客户决策、合同法律意见，也不会替你新增、修改、审批或付款。你可以问：“如何创建 PI？”“付款怎么冲正？”“部门数据范围是什么意思？”'};
+  const item=found[1];return {inScope:true,title:item.title,view:item.view,answer:item.steps.map((step,index)=>`${index+1}. ${step}`).join('\n')};
 }
 
 function pendingFulfillment(user,process){
@@ -225,7 +251,8 @@ async function api(req, res, url) {
     requireCsrf(req, user); const raw = parseCookies(req).erp_session; db.prepare('DELETE FROM sessions WHERE id_hash=?').run(tokenHash(raw));
     return json(res, 200, { ok: true }, { 'Set-Cookie': 'erp_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0' });
   }
-  if (req.method === 'GET' && path === '/api/dashboard') return json(res, 200, dashboard(user));
+  if (req.method === 'GET' && path === '/api/dashboard') return json(res, 200, dashboard(user,url.searchParams.get('period')));
+  if (req.method === 'POST' && path === '/api/assistant') {requireCsrf(req,user);const reply=assistantReply((await body(req)).query);audit({companyId:user.company_id,userId:user.id,action:'ask_operation_assistant',objectType:'assistant',after:{inScope:reply.inScope,view:reply.view||null}});return json(res,200,reply);}
   if (req.method === 'GET' && path === '/api/procurement/pending') return json(res,200,pendingFulfillment(user,'procurement'));
   if (req.method === 'GET' && path === '/api/delivery/pending') return json(res,200,pendingFulfillment(user,'delivery'));
   if (req.method === 'GET' && path === '/api/notifications') {
