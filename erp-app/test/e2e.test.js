@@ -29,6 +29,10 @@ async function request(session, path, method = 'GET', input) {
   const data = await response.json();
   return { status: response.status, data };
 }
+async function requestText(session, path) {
+  const response = await fetch(`http://127.0.0.1:${port}${path}`, { headers: { cookie: session?.cookie || '' } });
+  return { status: response.status, text: await response.text(), contentType: response.headers.get('content-type') };
+}
 
 before(async () => {
   child = spawn(process.execPath, ['src/server.js'], { cwd: process.cwd(), env: { ...process.env, PORT: String(port), ERP_DATA_DIR: dataDir }, stdio: 'ignore' });
@@ -72,6 +76,17 @@ test('核心业务链与职责分离', async () => {
   assert.equal(customerUpdate.status, 200);
   const staleCustomerUpdate = await request(admin, `/api/customers/${customer.data.id}`, 'PUT', { version: customerDetail.data.customer.version, name: '过期修改', country: '德国', email: 'anna@nordlicht.example' });
   assert.equal(staleCustomerUpdate.status, 409);
+
+  const multiQuote = await request(admin, '/api/quotes', 'POST', { customerId: customer.data.id, currency: 'USD', exchangeRate: 7.2, incoterm: 'FOB', paymentTerms: '30% deposit, 70% before shipment', validUntil: '2026-09-05', deliveryAt: '2026-10-01', notes: '多产品 PI 打印测试', items: [{ productId: product.data.id, description: '折叠露营灯 标准款', quantity: 100, unitPrice: 10, unitCost: 7 }, { productId: product.data.id, description: '折叠露营灯 礼盒款', quantity: 50, unitPrice: 12, unitCost: 8 }], charges: [{ name: '国际运费', kind: 'revenue', amount: 80 }, { name: '包装成本', kind: 'cost', amount: 30 }] });
+  assert.equal(multiQuote.status, 201);
+  assert.equal(multiQuote.data.amount, 1680);
+  const multiQuoteDetail = await request(admin, `/api/quotes/${multiQuote.data.id}`);
+  assert.equal(multiQuoteDetail.data.items.length, 2);
+  const piPrint = await requestText(admin, `/api/quotes/${multiQuote.data.id}/print`);
+  assert.equal(piPrint.status, 200);
+  assert.match(piPrint.contentType, /text\/html/);
+  assert.match(piPrint.text, /PROFORMA INVOICE/);
+  assert.match(piPrint.text, /礼盒款/);
 
   const quote = await request(admin, '/api/quotes', 'POST', { customerId: customer.data.id, currency: 'USD', exchangeRate: 7.2, incoterm: 'FOB', validUntil: '2026-09-01', items: [{ productId: product.data.id, description: '折叠露营灯', quantity: 1000, unitPrice: 10, unitCost: 8.8 }] });
   assert.equal(quote.status, 201);
@@ -117,6 +132,9 @@ test('核心业务链与职责分离', async () => {
   const orderDetail = await request(admin, `/api/orders/${converted.data.id}`);
   assert.equal(orderDetail.data.items.length, 1);
   assert.equal(orderDetail.data.finance[0].type, 'receivable');
+  const contractPrint = await requestText(admin, `/api/orders/${converted.data.id}/print`);
+  assert.equal(contractPrint.status, 200);
+  assert.match(contractPrint.text, /SALES CONTRACT/);
   const procurementPending = await request(admin, '/api/procurement/pending');
   const deliveryPending = await request(admin, '/api/delivery/pending');
   assert.equal(procurementPending.data[0].remaining_quantity, 1000);

@@ -44,6 +44,11 @@
 .timeline em { font-size: 11px; font-style: normal; color: #526159; }
 .finance-stack { display: grid; gap: 16px; margin-top: 16px; }
 .pending-pool { margin-bottom: 16px; }
+.quote-lines { border-top: 1px solid var(--line); padding-top: 16px; }
+#quote-line-list { display: grid; gap: 12px; margin-top: 12px; }
+.quote-line { display: grid; grid-template-columns: 1.2fr 1.8fr .7fr .8fr .8fr; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #faf9f4; }
+.quote-line-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; }
+.quote-line-head strong { font-size: 11px; letter-spacing: .04em; }
 .notice-list { display: grid; gap: 10px; }
 .notice { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 20px; border: 1px solid var(--line); border-left: 4px solid #99a79f; border-radius: 10px; background: var(--white); }
 .notice.high { border-left-color: var(--amber); }
@@ -56,4 +61,5 @@
   .detail-card { padding: 22px 18px 40px; }
   .detail-facts { grid-template-columns: 1fr 1fr; }
   .related-list article { grid-template-columns: 1fr 1fr; }
+  .quote-line { grid-template-columns: 1fr 1fr; }
 }
