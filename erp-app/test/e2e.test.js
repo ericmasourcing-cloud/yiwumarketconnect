@@ -76,6 +76,8 @@ test('核心业务链与职责分离', async () => {
   assert.equal(duplicateBankChange.status, 409);
   const bankApprovals = await request(admin, '/api/approvals');
   const bankApproval = bankApprovals.data.find(item => item.object_type === 'supplier_bank_change' && item.object_id === bankChange.data.id);
+  assert.equal(bankApproval.summary.counterparty,'宁波精工制造');
+  assert.equal(bankApproval.summary.detail,'招商银行宁波分行');
   const financeReminders = await request(finance, '/api/notifications');
   assert.ok(financeReminders.data.items.some(item => item.type === 'approval_escalated' && item.object_id === bankApproval.id));
   const bankFinanceReview = await request(finance, `/api/approvals/${bankApproval.id}/decision`, 'POST', { decision: 'approved', note: '已电话回拨并核验盖章文件' });

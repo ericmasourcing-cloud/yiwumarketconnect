@@ -1,0 +1,25 @@
+.approval-mobile { display: none; }
+
+@media (max-width: 720px) {
+  .approval-desktop { display: none; }
+  .approval-mobile { display: block; }
+  .mobile-section-head { display: flex; justify-content: space-between; align-items: center; margin: 18px 2px 10px; }
+  .mobile-section-head h3 { margin: 0; font-size: 14px; }
+  .mobile-section-head span { color: var(--muted); font-size: 10px; }
+  .approval-cards { display: grid; gap: 10px; }
+  .approval-card { border: 1px solid var(--line); border-radius: 14px; background: var(--white); padding: 16px; box-shadow: 0 4px 18px rgba(18,32,27,.04); }
+  .approval-card-head, .approval-card-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .approval-card-main { margin: 16px 0 13px; }
+  .approval-card-main small { color: var(--forest2); font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .approval-card-main h3 { margin: 6px 0; font: 500 19px Georgia,"Songti SC",serif; }
+  .approval-card-main p { margin: 0; color: #526159; font-size: 11px; }
+  .approval-card-main em { display: inline-block; margin: 8px 7px 0 0; border-radius: 20px; background: #f2f5ef; padding: 5px 8px; color: var(--forest2); font-size: 9px; font-style: normal; font-weight: 800; }
+  .approval-card dl { display: grid; grid-template-columns: repeat(3,1fr); margin: 0; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .approval-card dl div { padding: 9px; border-right: 1px solid var(--line); }
+  .approval-card dl div:last-child { border-right: 0; }
+  .approval-card dt { color: var(--muted); font-size: 8px; }
+  .approval-card dd { margin: 4px 0 0; font-size: 10px; font-weight: 800; overflow-wrap: anywhere; }
+  .approval-reason { margin: 13px 0; color: #526159; font-size: 11px; line-height: 1.55; }
+  .approval-card-actions button { flex: 1; min-height: 42px; }
+  .approval-history { display: none; }
+}
