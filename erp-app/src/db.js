@@ -177,6 +177,12 @@ CREATE TABLE IF NOT EXISTS attachments (
   file_name TEXT NOT NULL, mime_type TEXT NOT NULL, size_bytes INTEGER NOT NULL, sha256 TEXT NOT NULL,
   storage_name TEXT NOT NULL, uploaded_by TEXT NOT NULL REFERENCES users(id), created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS saved_views (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), user_id TEXT NOT NULL REFERENCES users(id),
+  module TEXT NOT NULL, name TEXT NOT NULL, filters_json TEXT NOT NULL DEFAULT '{}', page_size INTEGER NOT NULL DEFAULT 20,
+  is_default INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+  UNIQUE(user_id, module, name)
+);
 CREATE TABLE IF NOT EXISTS settings (
   company_id TEXT NOT NULL REFERENCES companies(id), key TEXT NOT NULL, value_json TEXT NOT NULL,
   updated_by TEXT NOT NULL REFERENCES users(id), updated_at TEXT NOT NULL, PRIMARY KEY(company_id,key)
@@ -199,6 +205,7 @@ CREATE INDEX IF NOT EXISTS ix_business_events ON business_events(object_type, ob
 CREATE INDEX IF NOT EXISTS ix_audit_object ON audit_logs(object_type, object_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_after_sales_order ON after_sales(sales_order_id, status);
 CREATE INDEX IF NOT EXISTS ix_attachment_object ON attachments(object_type, object_id, created_at);
+CREATE INDEX IF NOT EXISTS ix_saved_views_user ON saved_views(user_id, module, updated_at);
 `);
 
 function ensureColumn(table, definition) {

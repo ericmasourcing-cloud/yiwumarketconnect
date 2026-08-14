@@ -52,6 +52,12 @@ test('核心业务链与职责分离', async () => {
   assert.equal(settings.data.low_margin_bps.value, 1500);
   const updatedSetting = await request(admin, '/api/settings', 'PUT', { key: 'approval_reminder_hours', value: 18 });
   assert.equal(updatedSetting.status, 200);
+  const savedView = await request(admin, '/api/views', 'POST', { module: 'customers', name: '德国 A 级客户', filters: { country: '德国', level: 'A' }, pageSize: 20, isDefault: true });
+  assert.equal(savedView.status, 201);
+  const savedViews = await request(admin, '/api/views?module=customers');
+  assert.equal(savedViews.data.length, 1);
+  assert.deepEqual(savedViews.data[0].filters, { country: '德国', level: 'A' });
+  assert.equal(savedViews.data[0].is_default, 1);
   const newUser = await request(admin, '/api/users', 'POST', { name: '测试运营', email: 'ops-test@hangmao.local', role: 'operations', password: 'Operations@2026' });
   assert.equal(newUser.status, 201);
   const operations = await login('ops-test@hangmao.local', 'Operations@2026');
