@@ -188,6 +188,12 @@ CREATE TABLE IF NOT EXISTS fulfillment_closures (
   sales_order_item_id TEXT NOT NULL REFERENCES sales_order_items(id), quantity REAL NOT NULL CHECK(quantity > 0), reason TEXT NOT NULL,
   created_by TEXT NOT NULL REFERENCES users(id), created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS supplier_bank_changes (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), supplier_id TEXT NOT NULL REFERENCES suppliers(id),
+  old_bank_name TEXT, old_bank_account TEXT, new_bank_name TEXT NOT NULL, new_bank_account TEXT NOT NULL,
+  reason TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', requested_by TEXT NOT NULL REFERENCES users(id),
+  created_at TEXT NOT NULL, decided_at TEXT
+);
 CREATE TABLE IF NOT EXISTS settings (
   company_id TEXT NOT NULL REFERENCES companies(id), key TEXT NOT NULL, value_json TEXT NOT NULL,
   updated_by TEXT NOT NULL REFERENCES users(id), updated_at TEXT NOT NULL, PRIMARY KEY(company_id,key)
@@ -212,6 +218,7 @@ CREATE INDEX IF NOT EXISTS ix_after_sales_order ON after_sales(sales_order_id, s
 CREATE INDEX IF NOT EXISTS ix_attachment_object ON attachments(object_type, object_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_saved_views_user ON saved_views(user_id, module, updated_at);
 CREATE INDEX IF NOT EXISTS ix_fulfillment_closure_item ON fulfillment_closures(process, sales_order_item_id, created_at);
+CREATE INDEX IF NOT EXISTS ix_supplier_bank_changes ON supplier_bank_changes(company_id, supplier_id, status);
 `);
 
 function ensureColumn(table, definition) {

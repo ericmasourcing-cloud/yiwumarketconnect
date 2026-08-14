@@ -65,6 +65,23 @@ test('核心业务链与职责分离', async () => {
 
   const supplier = await request(admin, '/api/suppliers', 'POST', { name: '宁波精工制造', country: '中国', contactName: '王工', phone: '13800000000', wechat: 'nb-jinggong', shopUrl: 'https://example.com/store', address: '宁波市北仑区', mainCategories: '户外照明,小家电', taxNo: '91330200TEST', bankName: '中国银行宁波分行', bankAccount: '6222-TEST', paymentTerms: '30% 定金，70% 出货前', cooperationNotes: '交期稳定，包装需抽检', riskLevel: 'low' });
   assert.equal(supplier.status, 201);
+  const bankChange = await request(admin, `/api/suppliers/${supplier.data.id}/bank-change`, 'POST', { bankName: '招商银行宁波分行', bankAccount: 'CMB-NEW-8899', reason: '供应商提供盖章账户变更函' });
+  assert.equal(bankChange.status, 201);
+  const supplierBeforeBankApproval = await request(admin, `/api/suppliers/${supplier.data.id}`);
+  assert.equal(supplierBeforeBankApproval.data.supplier.bank_account, '6222-TEST');
+  const duplicateBankChange = await request(admin, `/api/suppliers/${supplier.data.id}/bank-change`, 'POST', { bankName: '建设银行宁波分行', bankAccount: 'CCB-OTHER-001', reason: '验证重复申请拦截' });
+  assert.equal(duplicateBankChange.status, 409);
+  const bankApprovals = await request(admin, '/api/approvals');
+  const bankApproval = bankApprovals.data.find(item => item.object_type === 'supplier_bank_change' && item.object_id === bankChange.data.id);
+  const bankFinanceReview = await request(finance, `/api/approvals/${bankApproval.id}/decision`, 'POST', { decision: 'approved', note: '已电话回拨并核验盖章文件' });
+  assert.equal(bankFinanceReview.data.complete, false);
+  const bankManagerReview = await request(manager, `/api/approvals/${bankApproval.id}/decision`, 'POST', { decision: 'approved', note: '批准启用经复核的新账户' });
+  assert.equal(bankManagerReview.data.complete, true);
+  const supplierAfterBankApproval = await request(admin, `/api/suppliers/${supplier.data.id}`);
+  assert.equal(supplierAfterBankApproval.data.supplier.bank_name, '招商银行宁波分行');
+  assert.equal(supplierAfterBankApproval.data.supplier.bank_account, 'CMB-NEW-8899');
+  const bankHistory = await request(admin, `/api/suppliers/${supplier.data.id}/bank-changes`);
+  assert.equal(bankHistory.data[0].status, 'approved');
   const product = await request(admin, '/api/products', 'POST', { sku: 'HM-001', name: '折叠露营灯', category: '户外照明', specifications: '双色温 / USB-C / 4000mAh', unit: 'pcs', salePrice: 12, costPrice: 9, currency: 'USD', supplierId: supplier.data.id, supplierSku: 'NB-LAMP-01', leadDays: 25, imageUrl: 'https://example.com/lamp.jpg', qrCode: 'HM-001', notes: '礼盒包装' });
   assert.equal(product.status, 201);
   const secondSupplier = await request(admin, '/api/suppliers', 'POST', { name: '义乌星光电器', country: '中国', phone: '13900000000', riskLevel: 'medium' });
