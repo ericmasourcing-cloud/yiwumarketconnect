@@ -12,7 +12,8 @@ export function now() { return new Date().toISOString(); }
 export function id(prefix) { return `${prefix}_${crypto.randomUUID()}`; }
 export function docNo(prefix) {
   const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
-  return `${prefix}-${stamp}-${Math.floor(Math.random() * 900 + 100)}`;
+  const suffix = crypto.randomUUID().replaceAll('-', '').slice(0, 8).toUpperCase();
+  return `${prefix}-${stamp}-${suffix}`;
 }
 
 db.exec(`
