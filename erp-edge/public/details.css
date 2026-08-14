@@ -9,6 +9,13 @@
   text-underline-offset: 4px;
 }
 .record-link:hover { color: #0b6b49; text-decoration-color: var(--forest2); }
+.metric-link { width: 100%; color: inherit; text-align: left; cursor: pointer; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+.metric-link:hover { transform: translateY(-2px); border-color: #9cb4a7; box-shadow: 0 10px 28px rgba(18, 32, 27, .09); }
+.pipeline-link { border: 0; background: transparent; padding: 0; cursor: pointer; color: inherit; }
+.pipeline-link:hover .bar { filter: brightness(1.12); }
+.dashboard-approval { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; }
+.dashboard-approval:hover { color: var(--forest2); }
+.payout-scroll { max-height: 430px; overflow: auto; }
 .detail-dialog {
   width: min(760px, 94vw);
   height: 100vh;
