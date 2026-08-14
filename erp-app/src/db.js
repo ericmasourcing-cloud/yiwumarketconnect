@@ -194,6 +194,12 @@ CREATE TABLE IF NOT EXISTS supplier_bank_changes (
   reason TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', requested_by TEXT NOT NULL REFERENCES users(id),
   created_at TEXT NOT NULL, decided_at TEXT
 );
+CREATE TABLE IF NOT EXISTS performance_reallocations (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), document_no TEXT NOT NULL UNIQUE,
+  application_month TEXT NOT NULL, changes_json TEXT NOT NULL, summary_json TEXT NOT NULL, notes TEXT,
+  status TEXT NOT NULL DEFAULT 'approval_pending', requested_by TEXT NOT NULL REFERENCES users(id),
+  created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS settings (
   company_id TEXT NOT NULL REFERENCES companies(id), key TEXT NOT NULL, value_json TEXT NOT NULL,
   updated_by TEXT NOT NULL REFERENCES users(id), updated_at TEXT NOT NULL, PRIMARY KEY(company_id,key)
@@ -219,6 +225,7 @@ CREATE INDEX IF NOT EXISTS ix_attachment_object ON attachments(object_type, obje
 CREATE INDEX IF NOT EXISTS ix_saved_views_user ON saved_views(user_id, module, updated_at);
 CREATE INDEX IF NOT EXISTS ix_fulfillment_closure_item ON fulfillment_closures(process, sales_order_item_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_supplier_bank_changes ON supplier_bank_changes(company_id, supplier_id, status);
+CREATE INDEX IF NOT EXISTS ix_performance_reallocations ON performance_reallocations(company_id, application_month, status);
 `);
 
 function ensureColumn(table, definition) {
