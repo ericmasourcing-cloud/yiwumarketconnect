@@ -93,7 +93,8 @@ async function api(req, res, url) {
     loginAttempts.delete(key); const raw = token(); const csrf = token(); const expires = new Date(Date.now() + sessionHours * 3600_000).toISOString();
     db.prepare('INSERT INTO sessions VALUES (?, ?, ?, ?, ?)').run(tokenHash(raw), user.id, csrf, expires, now());
     audit({ companyId: user.company_id, userId: user.id, action: 'login', objectType: 'session', ip: req.socket.remoteAddress });
-    return json(res, 200, { user: { id: user.id, name: user.name, email: user.email, role: user.role }, csrf }, { 'Set-Cookie': `erp_session=${raw}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${sessionHours * 3600}` });
+    const secure = req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : '';
+    return json(res, 200, { user: { id: user.id, name: user.name, email: user.email, role: user.role }, csrf }, { 'Set-Cookie': `erp_session=${raw}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${sessionHours * 3600}${secure}` });
   }
   const user = requireUser(req);
   if (req.method === 'GET' && path === '/api/me') return json(res, 200, { user: { id: user.id, name: user.name, email: user.email, role: user.role }, csrf: user.csrf_token });
