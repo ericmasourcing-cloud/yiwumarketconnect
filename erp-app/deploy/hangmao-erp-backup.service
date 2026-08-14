@@ -1,0 +1,7 @@
+[Unit]
+Description=Backup Hangmao ERP data
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hangmao-erp-backup
+

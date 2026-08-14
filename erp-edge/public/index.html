@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10271f">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>航贸云 ERP</title>
+  <link rel="stylesheet" href="/styles.css?v=3">
+  <link rel="stylesheet" href="/password-toggle.css?v=1">
+  <link rel="stylesheet" href="/details.css?v=3">
+  <link rel="stylesheet" href="/scope-switch.css?v=1">
+  <link rel="stylesheet" href="/mobile-approvals.css?v=1">
+  <link rel="stylesheet" href="/assistant-dashboard.css?v=1">
+  <link rel="stylesheet" href="/icons.css?v=1">
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="icon-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M14 17.5h7M17.5 14v7"/></symbol>
+    <symbol id="icon-customers" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="icon-quotes" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/><circle cx="9" cy="9" r="1"/></symbol>
+    <symbol id="icon-orders" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></symbol>
+    <symbol id="icon-products" viewBox="0 0 24 24"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="m3 8 9 5 9-5v8l-9 5-9-5Z"/><path d="M12 13v8"/></symbol>
+    <symbol id="icon-suppliers" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l5 3V9l5 3V5h4v16"/><path d="M8 17h1M13 17h1M18 9h1"/></symbol>
+    <symbol id="icon-purchases" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1"/><circle cx="19" cy="20" r="1"/><path d="M3 4h2l2.7 11.3a2 2 0 0 0 2 1.7h7.7a2 2 0 0 0 2-1.6L21 8H7M10 11h7"/></symbol>
+    <symbol id="icon-deliveries" viewBox="0 0 24 24"><path d="M3 17h18M5 17l1.5 3h11L19 17M4 13l3-7h10l3 7Z"/><path d="M12 6V3M9 13v-3h6v3M3 17c1 1 2 1 3 0s2-1 3 0 2 1 3 0 2-1 3 0 2 1 3 0 2-1 3 0"/></symbol>
+    <symbol id="icon-after-sales" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M12 8v4M12 16h.01"/></symbol>
+    <symbol id="icon-finance" viewBox="0 0 24 24"><path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h15v12H5a3 3 0 0 1-3-3V6"/><path d="M16 13h4M17 13h.01"/></symbol>
+    <symbol id="icon-shares" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-5 3 3 6-8"/><path d="M16 6h4v4"/></symbol>
+    <symbol id="icon-approvals" viewBox="0 0 24 24"><path d="M7 3h10v5a5 5 0 0 1-10 0V3ZM5 21h14M8 17h8M12 13v4"/><path d="m9.5 7.5 1.5 1.5 3.5-3.5"/></symbol>
+    <symbol id="icon-notifications" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
+    <symbol id="icon-audit" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></symbol>
+  </svg>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <section id="login" class="login-shell">
+    <div class="login-art">
+      <div class="brand-mark"><svg class="brand-logo" viewBox="0 0 48 48" aria-label="航贸云"><rect x="2" y="2" width="44" height="44" rx="13"/><path d="M15 14v20M33 14v20M15 24h15"/><path d="m27 20 4 4-4 4"/><circle cx="15" cy="14" r="1.5"/><circle cx="33" cy="34" r="1.5"/></svg></div>
+      <div>
+        <p class="eyebrow">GLOBAL TRADE OPERATING SYSTEM</p>
+        <h1>让每一笔订单<br>都经得起追溯。</h1>
+        <p class="lead">从客户意向到最终利润，把状态、资金、责任和证据连接成一条可靠的业务链。</p>
+      </div>
+      <div class="route-line"><span>询盘</span><i></i><span>履约</span><i></i><span>资金</span><i></i><span>利润</span></div>
+    </div>
+    <form id="login-form" class="login-card">
+      <p class="eyebrow dark">SECURE WORKSPACE</p>
+      <h2>登录航贸云</h2>
+      <p class="muted">使用企业账号进入工作台</p>
+      <label>邮箱<input name="email" type="email" autocomplete="username" required></label>
+      <label>密码
+        <span class="password-field">
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+          <button id="password-toggle" class="password-toggle" type="button" aria-label="显示密码" aria-pressed="false">显示</button>
+        </span>
+      </label>
+      <button class="primary" type="submit">进入工作台 <span>→</span></button>
+      <p class="demo-note">企业内部系统 · 登录行为将记录安全日志</p>
+    </form>
+  </section>
+
+  <div id="app" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark small"><svg class="brand-logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="2" y="2" width="44" height="44" rx="13"/><path d="M15 14v20M33 14v20M15 24h15"/><path d="m27 20 4 4-4 4"/><circle cx="15" cy="14" r="1.5"/><circle cx="33" cy="34" r="1.5"/></svg></span><div><strong>航贸云</strong><small>Trade OS</small></div></div>
+      <nav id="nav">
+        <button data-view="dashboard" class="active" aria-label="经营总览"><span><svg><use href="#icon-dashboard"/></svg></span>经营总览</button>
+        <p>销售前台</p>
+        <button data-view="customers" aria-label="客户与跟进"><span><svg><use href="#icon-customers"/></svg></span>客户与跟进</button>
+        <button data-view="quotes" aria-label="报价管理"><span><svg><use href="#icon-quotes"/></svg></span>报价管理</button>
+        <button data-view="orders" aria-label="销售合同"><span><svg><use href="#icon-orders"/></svg></span>销售合同</button>
+        <p>供应与履约</p>
+        <button data-view="products" aria-label="产品中心"><span><svg><use href="#icon-products"/></svg></span>产品中心</button>
+        <button data-view="suppliers" aria-label="供应商"><span><svg><use href="#icon-suppliers"/></svg></span>供应商</button>
+        <button data-view="purchases" aria-label="采购管理"><span><svg><use href="#icon-purchases"/></svg></span>采购管理</button>
+        <button data-view="deliveries" aria-label="出运管理"><span><svg><use href="#icon-deliveries"/></svg></span>出运管理</button>
+        <button data-view="afterSales" aria-label="售后与客诉"><span><svg><use href="#icon-after-sales"/></svg></span>售后与客诉</button>
+        <p>经营控制</p>
+        <button data-view="finance" aria-label="资金与利润"><span><svg><use href="#icon-finance"/></svg></span>资金与利润</button>
+        <button data-view="shares" aria-label="利润与提成"><span><svg><use href="#icon-shares"/></svg></span>利润与提成</button>
+        <button data-view="approvals" aria-label="审批中心"><span><svg><use href="#icon-approvals"/></svg></span>审批中心 <b id="approval-badge"></b></button>
+        <button data-view="notifications" aria-label="通知中心"><span><svg><use href="#icon-notifications"/></svg></span>通知中心 <b id="notification-badge"></b></button>
+        <button data-view="audit" aria-label="审计日志"><span><svg><use href="#icon-audit"/></svg></span>审计日志</button>
+        <button data-view="settings" aria-label="系统设置"><span><svg><use href="#icon-settings"/></svg></span>系统设置</button>
+      </nav>
+      <div class="sidebar-foot"><div id="avatar">管</div><div><strong id="user-name">—</strong><small id="user-role">—</small></div><button id="logout" title="退出">↗</button></div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div><p id="breadcrumb">经营控制台 / 总览</p><h2 id="page-title">经营总览</h2></div>
+        <div class="top-actions"><button id="ask-ai" class="icon-btn ask-ai-button" type="button">✦ Ask AI</button><label class="scope-switch">数据范围 <select id="data-scope"><option value="personal">个人</option><option value="department">部门</option><option value="company">全公司</option></select></label><div class="global-search-wrap"><label class="search">⌕ <input id="global-search" autocomplete="off" placeholder="全局搜索单号、客户、产品"></label><div id="global-search-results" class="global-search-results hidden"></div></div><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+
+  <dialog id="modal"><form method="dialog" class="modal-card"><div class="modal-head"><div><p class="eyebrow dark" id="modal-kicker">NEW RECORD</p><h3 id="modal-title">新增</h3></div><button value="cancel" class="close">×</button></div><div id="modal-body"></div><div class="modal-actions"><button value="cancel" class="secondary">取消</button><button id="modal-submit" value="default" class="primary">保存记录</button></div></form></dialog>
+  <dialog id="quick-modal"><form method="dialog" class="modal-card"><div class="modal-head"><div><p class="eyebrow dark">QUICK CREATE</p><h3 id="quick-modal-title">快速新建</h3></div><button value="cancel" class="close">×</button></div><div id="quick-modal-body"></div><div class="modal-actions"><button value="cancel" class="secondary">取消</button><button id="quick-modal-submit" value="default" class="primary">保存并回填</button></div></form></dialog>
+  <dialog id="detail-drawer" class="detail-dialog"><div class="detail-card"><div class="detail-head"><div><p class="eyebrow dark" id="detail-kicker">BUSINESS RECORD</p><h3 id="detail-title">业务详情</h3></div><button id="detail-close" class="close" type="button">×</button></div><div id="detail-body"></div></div></dialog>
+  <dialog id="assistant-dialog" class="assistant-dialog"><div class="assistant-card"><div class="modal-head"><div><p class="eyebrow dark">OPERATION GUIDE</p><h3>Ask AI 操作助手</h3></div><button id="assistant-close" class="close" type="button">×</button></div><p class="muted">只回答航贸云页面和操作步骤，不执行新增、修改、审批或付款。</p><div id="assistant-answer" class="assistant-answer"><p>例如：如何创建 PI？付款填错了怎么冲正？部门数据范围是什么意思？</p></div><form id="assistant-form"><textarea name="query" maxlength="300" rows="3" required placeholder="输入你的系统操作问题"></textarea><button class="primary" type="submit">发送问题</button></form></div></dialog>
+  <script type="module" src="/app.js?v=12"></script>
+</body>
+</html>

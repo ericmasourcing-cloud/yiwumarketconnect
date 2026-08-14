@@ -1,0 +1,17 @@
+{
+  "name": "hangmaoyun-erp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "外贸业务全流程 ERP",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test --test-reporter=spec",
+    "demo": "node scripts/load-demo.mjs",
+    "backup": "node scripts/backup.mjs"
+  },
+  "engines": {
+    "node": ">=22.5"
+  }
+}
