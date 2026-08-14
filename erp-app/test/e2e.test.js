@@ -65,9 +65,14 @@ test('核心业务链与职责分离', async () => {
   assert.equal(newUser.status, 201);
   const operations = await login('ops-test@hangmao.local', 'Operations@2026');
   const finance = await login('finance@hangmao.local', 'Finance@2026');
+  const sales = await login('sales@hangmao.local', 'Sales@2026');
 
   const supplier = await request(admin, '/api/suppliers', 'POST', { name: '宁波精工制造', country: '中国', contactName: '王工', phone: '13800000000', wechat: 'nb-jinggong', shopUrl: 'https://example.com/store', address: '宁波市北仑区', mainCategories: '户外照明,小家电', taxNo: '91330200TEST', bankName: '中国银行宁波分行', bankAccount: '6222-TEST', paymentTerms: '30% 定金，70% 出货前', cooperationNotes: '交期稳定，包装需抽检', riskLevel: 'low' });
   assert.equal(supplier.status, 201);
+  const salesSupplier = await request(sales, `/api/suppliers/${supplier.data.id}`);
+  assert.equal(salesSupplier.data.supplier.bank_account, '****TEST');
+  const salesFieldPermissions = await request(sales, '/api/field-permissions');
+  assert.equal(salesFieldPermissions.data.fields.find(item => item.field === '银行账号').read, '仅显示尾号');
   const bankChange = await request(admin, `/api/suppliers/${supplier.data.id}/bank-change`, 'POST', { bankName: '招商银行宁波分行', bankAccount: 'CMB-NEW-8899', reason: '供应商提供盖章账户变更函' });
   assert.equal(bankChange.status, 201);
   const supplierBeforeBankApproval = await request(admin, `/api/suppliers/${supplier.data.id}`);
@@ -91,6 +96,8 @@ test('核心业务链与职责分离', async () => {
   const supplierAfterBankApproval = await request(admin, `/api/suppliers/${supplier.data.id}`);
   assert.equal(supplierAfterBankApproval.data.supplier.bank_name, '招商银行宁波分行');
   assert.equal(supplierAfterBankApproval.data.supplier.bank_account, 'CMB-NEW-8899');
+  const directSensitiveUpdate = await request(manager, `/api/suppliers/${supplier.data.id}`, 'PUT', { version: supplierAfterBankApproval.data.supplier.version, name: '宁波精工制造', country: '中国', bankName: '绕过审批银行', bankAccount: 'BYPASS-001' });
+  assert.equal(directSensitiveUpdate.status, 403);
   const bankHistory = await request(admin, `/api/suppliers/${supplier.data.id}/bank-changes`);
   assert.equal(bankHistory.data[0].status, 'approved');
   const product = await request(admin, '/api/products', 'POST', { sku: 'HM-001', name: '折叠露营灯', category: '户外照明', specifications: '双色温 / USB-C / 4000mAh', unit: 'pcs', salePrice: 12, costPrice: 9, currency: 'USD', supplierId: supplier.data.id, supplierSku: 'NB-LAMP-01', leadDays: 25, imageUrl: 'https://example.com/lamp.jpg', qrCode: 'HM-001', notes: '礼盒包装' });
@@ -398,6 +405,26 @@ test('核心业务链与职责分离', async () => {
   assert.equal(reallocatedShare.beneficiary_id, operations.user.id);
   assert.equal(reallocatedShare.amount_base, 600);
   assert.equal(reallocatedShare.settlement_status, 'outstanding');
+  const monthlyReport = await request(admin, '/api/performance/monthly?month=2026-08');
+  assert.equal(monthlyReport.status, 200);
+  assert.equal(monthlyReport.data.summary.contractCount, 1);
+  assert.equal(monthlyReport.data.summary.championName, '陈晓岚');
+  assert.ok(monthlyReport.data.summary.companyRetained > 0);
+  const shareApprovalDetail = await request(admin, `/api/approvals/${shareApproval.id}`);
+  assert.equal(shareApprovalDetail.data.approval.performance_month, '2026-08');
+  assert.equal(shareApprovalDetail.data.monthlyAllocationSummary.length, 1);
+  assert.ok(shareApprovalDetail.data.monthlyAllocationTable.length >= 2);
+  const monthlyPrint = await requestText(admin, '/api/performance/monthly/print?month=2026-08');
+  assert.equal(monthlyPrint.status, 200);
+  assert.match(monthlyPrint.text, /月度完整分配表/);
+  assert.match(monthlyPrint.text, /本月冠军/);
+  const batchShare = await request(admin, '/api/shares/batch', 'POST', { salesOrderIds: [converted.data.id], beneficiaryId: operations.user.id, percent: 2, applicationMonth: '2026-08', customerConfirmedAt: '2026-08-28', notes: '批量发起接口与证明上传验收', evidenceRef: 'batch-proof.txt' });
+  assert.equal(batchShare.status, 201);
+  assert.equal(batchShare.data.count, 1);
+  const batchProof = await request(admin, '/api/attachments', 'POST', { objectType: 'performance_share', objectId: batchShare.data.created[0].id, fileName: 'batch-proof.txt', mimeType: 'text/plain', dataBase64: Buffer.from('customer confirmed delivery').toString('base64') });
+  assert.equal(batchProof.status, 201);
+  const batchAttachments = await request(admin, `/api/attachments?objectType=performance_share&objectId=${batchShare.data.created[0].id}`);
+  assert.equal(batchAttachments.data.length, 1);
 
   const voidRequest = await request(admin, `/api/purchases/${purchase.data.id}/void`, 'POST', { reason: '供应商无法按期交货，取消采购' });
   assert.equal(voidRequest.status, 202);
