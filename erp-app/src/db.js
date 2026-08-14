@@ -236,6 +236,10 @@ for (const definition of [
   'reversal_of_id TEXT', 'reversal_reason TEXT', 'reversed_by TEXT', 'reversed_at TEXT'
 ]) ensureColumn('finance_entries', definition);
 db.exec(`UPDATE finance_entries SET expected_base_amount_minor=base_amount_minor WHERE expected_base_amount_minor=0 AND base_amount_minor>0`);
+for (const definition of [
+  'application_month TEXT', 'customer_confirmed_at TEXT', 'allocation_bps INTEGER NOT NULL DEFAULT 0',
+  'notes TEXT', 'evidence_ref TEXT'
+]) ensureColumn('performance_shares', definition);
 
 export function transaction(fn) {
   db.exec('BEGIN IMMEDIATE');

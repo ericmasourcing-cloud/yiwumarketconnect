@@ -196,8 +196,13 @@ test('核心业务链与职责分离', async () => {
   assert.equal(attachments.data.length, 1);
   const profits = await request(admin, '/api/profits');
   assert.equal(profits.data[0].grossProfit, 16600);
-  const share = await request(admin, '/api/shares', 'POST', { salesOrderId: converted.data.id, beneficiaryId: 'user_sales', amount: 2000 });
+  const share = await request(admin, '/api/shares', 'POST', { salesOrderId: converted.data.id, beneficiaryId: 'user_sales', amount: 2000, applicationMonth: '2026-08', customerConfirmedAt: '2026-08-28', notes: '客户已确认本月业绩归属', evidenceRef: 'CONFIRM-2026-08-001' });
   assert.equal(share.status, 201);
+  assert.ok(share.data.allocationPercent > 0);
+  const allocationBeforeApproval = await request(admin, '/api/performance/workbench?month=2026-08');
+  assert.equal(allocationBeforeApproval.data.summary.pendingApproval, 1);
+  assert.equal(allocationBeforeApproval.data.people[0].beneficiary_id, 'user_sales');
+  assert.equal(allocationBeforeApproval.data.shares[0].evidence_ref, 'CONFIRM-2026-08-001');
   const shareApprovals = await request(admin, '/api/approvals');
   const shareApproval = shareApprovals.data.find(item => item.object_id === share.data.id);
   assert.equal(shareApproval.total_steps, 2);
@@ -205,6 +210,10 @@ test('核心业务链与职责分离', async () => {
   assert.deepEqual(firstStep.data, { ok: true, complete: false });
   const secondStep = await request(finance, `/api/approvals/${shareApproval.id}/decision`, 'POST', { decision: 'approved', note: '财务复核利润口径' });
   assert.deepEqual(secondStep.data, { ok: true, complete: true });
+  const allocationAfterApproval = await request(admin, '/api/performance/workbench?month=2026-08');
+  assert.equal(allocationAfterApproval.data.summary.pendingApproval, 0);
+  assert.equal(allocationAfterApproval.data.summary.pendingPayment, 1);
+  assert.equal(allocationAfterApproval.data.shares[0].settlement_status, 'outstanding');
 
   const voidRequest = await request(admin, `/api/purchases/${purchase.data.id}/void`, 'POST', { reason: '供应商无法按期交货，取消采购' });
   assert.equal(voidRequest.status, 202);
