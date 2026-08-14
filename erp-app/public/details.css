@@ -42,6 +42,15 @@
 .timeline strong { font-size: 11px; }
 .timeline span { font-size: 9px; color: var(--muted); }
 .timeline em { font-size: 11px; font-style: normal; color: #526159; }
+.finance-stack { display: grid; gap: 16px; margin-top: 16px; }
+.notice-list { display: grid; gap: 10px; }
+.notice { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 20px; border: 1px solid var(--line); border-left: 4px solid #99a79f; border-radius: 10px; background: var(--white); }
+.notice.high { border-left-color: var(--amber); }
+.notice.critical { border-left-color: var(--red); }
+.notice.read { opacity: .58; }
+.notice h3 { margin: 4px 0; font-size: 13px; }
+.notice p { margin: 0 0 5px; color: #526159; font-size: 11px; }
+.notice small, .notice span { color: var(--muted); font-size: 9px; letter-spacing: .06em; }
 @media (max-width: 620px) {
   .detail-card { padding: 22px 18px 40px; }
   .detail-facts { grid-template-columns: 1fr 1fr; }

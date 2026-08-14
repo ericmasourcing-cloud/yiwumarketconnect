@@ -107,6 +107,35 @@ CREATE TABLE IF NOT EXISTS finance_entries (
   base_amount_minor INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', occurred_at TEXT, reference TEXT,
   created_by TEXT NOT NULL, confirmed_by TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS payment_schedules (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), document_no TEXT NOT NULL UNIQUE,
+  object_type TEXT NOT NULL, object_id TEXT NOT NULL, direction TEXT NOT NULL CHECK(direction IN ('receivable','payable')),
+  label TEXT NOT NULL, due_at TEXT, currency TEXT NOT NULL, amount_minor INTEGER NOT NULL CHECK(amount_minor > 0),
+  paid_minor INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'outstanding', sequence_no INTEGER NOT NULL DEFAULT 1,
+  created_by TEXT NOT NULL REFERENCES users(id), created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS finance_allocations (
+  id TEXT PRIMARY KEY, finance_entry_id TEXT NOT NULL REFERENCES finance_entries(id),
+  schedule_id TEXT NOT NULL REFERENCES payment_schedules(id), amount_minor INTEGER NOT NULL CHECK(amount_minor > 0),
+  created_at TEXT NOT NULL, UNIQUE(finance_entry_id, schedule_id)
+);
+CREATE TABLE IF NOT EXISTS expense_lines (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), object_type TEXT NOT NULL,
+  object_id TEXT NOT NULL, name TEXT NOT NULL, category TEXT NOT NULL, currency TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL CHECK(amount_minor >= 0), created_by TEXT NOT NULL REFERENCES users(id), created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS product_supplier_quotes (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), product_id TEXT NOT NULL REFERENCES products(id),
+  supplier_id TEXT NOT NULL REFERENCES suppliers(id), supplier_sku TEXT, currency TEXT NOT NULL, unit_cost_minor INTEGER NOT NULL,
+  moq REAL NOT NULL DEFAULT 1, lead_days INTEGER, valid_until TEXT, is_preferred INTEGER NOT NULL DEFAULT 0,
+  created_by TEXT NOT NULL REFERENCES users(id), created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+  UNIQUE(product_id, supplier_id, supplier_sku)
+);
+CREATE TABLE IF NOT EXISTS notifications (
+  id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), user_id TEXT REFERENCES users(id),
+  type TEXT NOT NULL, title TEXT NOT NULL, message TEXT NOT NULL, object_type TEXT, object_id TEXT,
+  priority TEXT NOT NULL DEFAULT 'normal', read_at TEXT, created_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS approvals (
   id TEXT PRIMARY KEY, company_id TEXT NOT NULL REFERENCES companies(id), document_no TEXT NOT NULL UNIQUE,
   object_type TEXT NOT NULL, object_id TEXT NOT NULL, object_version INTEGER NOT NULL, reason TEXT NOT NULL,
@@ -158,6 +187,11 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX IF NOT EXISTS ix_quotes_customer ON quotes(customer_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_orders_customer ON sales_orders(customer_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_finance_order ON finance_entries(sales_order_id, type, status);
+CREATE INDEX IF NOT EXISTS ix_payment_schedule_due ON payment_schedules(company_id, direction, status, due_at);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_payment_schedule_object ON payment_schedules(company_id, object_type, object_id, direction, sequence_no);
+CREATE INDEX IF NOT EXISTS ix_finance_allocation_schedule ON finance_allocations(schedule_id);
+CREATE INDEX IF NOT EXISTS ix_expense_object ON expense_lines(object_type, object_id);
+CREATE INDEX IF NOT EXISTS ix_notification_user ON notifications(company_id, user_id, read_at, created_at);
 CREATE INDEX IF NOT EXISTS ix_approvals_pending ON approvals(status, assigned_role, created_at);
 CREATE INDEX IF NOT EXISTS ix_approval_steps ON approval_steps(approval_id, step_no);
 CREATE INDEX IF NOT EXISTS ix_business_events ON business_events(object_type, object_id, created_at);
@@ -165,6 +199,36 @@ CREATE INDEX IF NOT EXISTS ix_audit_object ON audit_logs(object_type, object_id,
 CREATE INDEX IF NOT EXISTS ix_after_sales_order ON after_sales(sales_order_id, status);
 CREATE INDEX IF NOT EXISTS ix_attachment_object ON attachments(object_type, object_id, created_at);
 `);
+
+function ensureColumn(table, definition) {
+  const column = definition.trim().split(/\s+/)[0];
+  const exists = db.prepare(`PRAGMA table_info(${table})`).all().some(row => row.name === column);
+  if (!exists) db.exec(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
+}
+
+for (const definition of [
+  'contact_person_name TEXT', 'company_name TEXT', 'whatsapp TEXT', 'source TEXT', 'source_detail TEXT',
+  'website TEXT', 'tags TEXT', 'core_needs TEXT', 'project_background TEXT', 'followup_notes TEXT',
+  'shipping_address TEXT', 'status TEXT NOT NULL DEFAULT \'active\''
+]) ensureColumn('customers', definition);
+for (const definition of [
+  'wechat TEXT', 'shop_url TEXT', 'address TEXT', 'main_categories TEXT', 'tax_no TEXT',
+  'bank_name TEXT', 'bank_account TEXT', 'payment_terms TEXT', 'cooperation_notes TEXT'
+]) ensureColumn('suppliers', definition);
+for (const definition of [
+  'specifications TEXT', 'image_url TEXT', 'qr_code TEXT', 'notes TEXT'
+]) ensureColumn('products', definition);
+for (const definition of ['notes TEXT', 'delivery_at TEXT']) ensureColumn('quotes', definition);
+for (const definition of ['incoterm TEXT', 'payment_terms TEXT', 'delivery_at TEXT', 'notes TEXT']) ensureColumn('sales_orders', definition);
+for (const definition of [
+  'ordered_at TEXT', 'procurement_method TEXT', 'tax_included INTEGER NOT NULL DEFAULT 0',
+  'tax_rate REAL NOT NULL DEFAULT 0', 'payment_terms TEXT', 'notes TEXT', 'closed_remaining_reason TEXT'
+]) ensureColumn('purchase_orders', definition);
+for (const definition of [
+  'origin_location TEXT', 'incoterm TEXT', 'notes TEXT', 'package_materials TEXT', 'package_count INTEGER',
+  'gross_weight REAL', 'volume_cbm REAL', 'closed_remaining_reason TEXT'
+]) ensureColumn('delivery_orders', definition);
+for (const definition of ['payment_channel TEXT', 'other_channel TEXT', 'note TEXT']) ensureColumn('finance_entries', definition);
 
 export function transaction(fn) {
   db.exec('BEGIN IMMEDIATE');
@@ -209,4 +273,24 @@ const adminForSettings = db.prepare(`SELECT id FROM users WHERE role='admin' LIM
 if (companyForSettings && adminForSettings) {
   const insertSetting = db.prepare('INSERT OR IGNORE INTO settings VALUES (?, ?, ?, ?, ?)');
   for (const [key, value] of Object.entries(defaultSettings)) insertSetting.run(companyForSettings.id, key, JSON.stringify(value), adminForSettings.id, now());
+
+  const insertSchedule = db.prepare(`INSERT OR IGNORE INTO payment_schedules (id,company_id,document_no,object_type,object_id,direction,label,due_at,currency,amount_minor,paid_minor,status,sequence_no,created_by,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,0,'outstanding',1,?,?,?)`);
+  for (const order of db.prepare(`SELECT id,company_id,currency,amount_minor,created_at FROM sales_orders WHERE deleted_at IS NULL AND status!='void'`).all())
+    insertSchedule.run(id('schedule'),order.company_id,docNo('AR'),'sales_order',order.id,'receivable','合同应收款',null,order.currency,order.amount_minor,adminForSettings.id,order.created_at,now());
+  for (const purchase of db.prepare(`SELECT id,company_id,currency,amount_minor,expected_at,created_at FROM purchase_orders WHERE deleted_at IS NULL AND status!='void'`).all())
+    insertSchedule.run(id('schedule'),purchase.company_id,docNo('AP'),'purchase_order',purchase.id,'payable','采购应付款',purchase.expected_at,purchase.currency,purchase.amount_minor,adminForSettings.id,purchase.created_at,now());
+  for (const delivery of db.prepare(`SELECT id,company_id,currency,freight_minor,planned_at,created_at FROM delivery_orders WHERE deleted_at IS NULL AND status!='void' AND freight_minor>0`).all())
+    insertSchedule.run(id('schedule'),delivery.company_id,docNo('AP'),'delivery_order',delivery.id,'payable','出运及货代应付款',delivery.planned_at,delivery.currency,delivery.freight_minor,adminForSettings.id,delivery.created_at,now());
+  db.exec(`
+    UPDATE payment_schedules SET paid_minor=MIN(amount_minor,COALESCE((
+      SELECT SUM(f.amount_minor) FROM finance_entries f WHERE f.status='confirmed' AND f.type='receipt' AND f.sales_order_id=payment_schedules.object_id
+    ),0)) WHERE object_type='sales_order' AND direction='receivable';
+    UPDATE payment_schedules SET paid_minor=MIN(amount_minor,COALESCE((
+      SELECT SUM(f.amount_minor) FROM finance_entries f WHERE f.status='confirmed' AND f.type='payment' AND f.purchase_order_id=payment_schedules.object_id
+    ),0)) WHERE object_type='purchase_order' AND direction='payable';
+    UPDATE payment_schedules SET paid_minor=MIN(amount_minor,COALESCE((
+      SELECT SUM(f.amount_minor) FROM finance_entries f WHERE f.status='confirmed' AND f.type='payment' AND f.delivery_order_id=payment_schedules.object_id
+    ),0)) WHERE object_type='delivery_order' AND direction='payable';
+    UPDATE payment_schedules SET status=CASE WHEN paid_minor>=amount_minor THEN 'paid' WHEN paid_minor>0 THEN 'partial' ELSE 'outstanding' END;
+  `);
 }
