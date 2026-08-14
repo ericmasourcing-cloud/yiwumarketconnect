@@ -50,8 +50,10 @@ test('核心业务链与职责分离', async () => {
   const manager = await login('manager@hangmao.local', 'Manager@2026');
   const settings = await request(admin, '/api/settings');
   assert.equal(settings.data.low_margin_bps.value, 1500);
-  const updatedSetting = await request(admin, '/api/settings', 'PUT', { key: 'approval_reminder_hours', value: 18 });
+  const updatedSetting = await request(admin, '/api/settings', 'PUT', { key: 'approval_reminder_hours', value: 0 });
   assert.equal(updatedSetting.status, 200);
+  const escalationSetting = await request(admin, '/api/settings', 'PUT', { key: 'approval_escalation_hours', value: 0 });
+  assert.equal(escalationSetting.status, 200);
   const savedView = await request(admin, '/api/views', 'POST', { module: 'customers', name: '德国 A 级客户', filters: { country: '德国', level: 'A' }, pageSize: 20, isDefault: true });
   assert.equal(savedView.status, 201);
   const savedViews = await request(admin, '/api/views?module=customers');
@@ -73,10 +75,16 @@ test('核心业务链与职责分离', async () => {
   assert.equal(duplicateBankChange.status, 409);
   const bankApprovals = await request(admin, '/api/approvals');
   const bankApproval = bankApprovals.data.find(item => item.object_type === 'supplier_bank_change' && item.object_id === bankChange.data.id);
+  const financeReminders = await request(finance, '/api/notifications');
+  assert.ok(financeReminders.data.items.some(item => item.type === 'approval_escalated' && item.object_id === bankApproval.id));
   const bankFinanceReview = await request(finance, `/api/approvals/${bankApproval.id}/decision`, 'POST', { decision: 'approved', note: '已电话回拨并核验盖章文件' });
   assert.equal(bankFinanceReview.data.complete, false);
+  const bankProgress = await request(admin, '/api/notifications');
+  assert.ok(bankProgress.data.items.some(item => item.type === 'approval_progress' && item.object_id === bankApproval.id));
   const bankManagerReview = await request(manager, `/api/approvals/${bankApproval.id}/decision`, 'POST', { decision: 'approved', note: '批准启用经复核的新账户' });
   assert.equal(bankManagerReview.data.complete, true);
+  const bankCompletedNotice = await request(admin, '/api/notifications');
+  assert.ok(bankCompletedNotice.data.items.some(item => item.type === 'approval_progress' && item.object_id === bankApproval.id && item.title === '审批已完成'));
   const supplierAfterBankApproval = await request(admin, `/api/suppliers/${supplier.data.id}`);
   assert.equal(supplierAfterBankApproval.data.supplier.bank_name, '招商银行宁波分行');
   assert.equal(supplierAfterBankApproval.data.supplier.bank_account, 'CMB-NEW-8899');
@@ -87,6 +95,12 @@ test('核心业务链与职责分离', async () => {
   const secondSupplier = await request(admin, '/api/suppliers', 'POST', { name: '义乌星光电器', country: '中国', phone: '13900000000', riskLevel: 'medium' });
   const supplierQuote = await request(admin, `/api/products/${product.data.id}/supplier-quotes`, 'POST', { supplierId: secondSupplier.data.id, supplierSku: 'YW-STAR-88', currency: 'USD', unitCost: 8.7, moq: 500, leadDays: 20, validUntil: '2026-10-01', isPreferred: true });
   assert.equal(supplierQuote.status, 201);
+  const linkedSupplierDelete = await request(admin, `/api/suppliers/${secondSupplier.data.id}`, 'DELETE', { reason: '验证有关联报价时禁止删除' });
+  assert.equal(linkedSupplierDelete.status, 409);
+  const unusedSupplier = await request(admin, '/api/suppliers', 'POST', { name: '临时未合作供应商', country: '中国', phone: '13700000000' });
+  const unusedSupplierDelete = await request(admin, `/api/suppliers/${unusedSupplier.data.id}`, 'DELETE', { reason: '建档重复且尚无业务关联' });
+  assert.equal(unusedSupplierDelete.status, 200);
+  assert.equal(unusedSupplierDelete.data.recoverable, true);
   const productDetail = await request(admin, `/api/products/${product.data.id}`);
   assert.equal(productDetail.data.supplierQuotes.length, 2);
   assert.equal(productDetail.data.product.specifications, '双色温 / USB-C / 4000mAh');
@@ -183,6 +197,10 @@ test('核心业务链与职责分离', async () => {
 
   const purchase = await request(admin, '/api/purchases', 'POST', { salesOrderId: converted.data.id, supplierId: supplier.data.id, currency: 'USD', orderedAt: '2026-08-14', procurementMethod: 'direct', taxIncluded: true, taxRate: 13, paymentTerms: '30% 定金，70% 出货前', notes: '首批验货后付尾款', expenses: [{ name: '国内运费', category: 'freight', amount: 100 }], items: [{ salesOrderItemId: orderDetail.data.items[0].id, quantity: 600, unitCost: 8.8 }] });
   assert.equal(purchase.status, 201);
+  const suppliersWithCooperation = await request(admin, '/api/suppliers');
+  assert.equal(suppliersWithCooperation.data.find(item => item.id === supplier.data.id).cooperation_count, 1);
+  const supplierWithPurchaseDelete = await request(admin, `/api/suppliers/${supplier.data.id}`, 'DELETE', { reason: '验证已有采购记录时禁止删除' });
+  assert.equal(supplierWithPurchaseDelete.status, 409);
   const overPurchase = await request(admin, '/api/purchases', 'POST', { salesOrderId: converted.data.id, supplierId: supplier.data.id, currency: 'USD', items: [{ salesOrderItemId: orderDetail.data.items[0].id, quantity: 500, unitCost: 8.8 }] });
   assert.equal(overPurchase.status, 422);
   const procurementPendingAfter = await request(admin, '/api/procurement/pending');
