@@ -230,7 +230,12 @@ for (const definition of [
   'origin_location TEXT', 'incoterm TEXT', 'notes TEXT', 'package_materials TEXT', 'package_count INTEGER',
   'gross_weight REAL', 'volume_cbm REAL', 'closed_remaining_reason TEXT', 'document_status TEXT NOT NULL DEFAULT \'effective\''
 ]) ensureColumn('delivery_orders', definition);
-for (const definition of ['payment_channel TEXT', 'other_channel TEXT', 'note TEXT']) ensureColumn('finance_entries', definition);
+for (const definition of [
+  'payment_channel TEXT', 'other_channel TEXT', 'note TEXT',
+  'expected_base_amount_minor INTEGER NOT NULL DEFAULT 0', 'exchange_difference_minor INTEGER NOT NULL DEFAULT 0',
+  'reversal_of_id TEXT', 'reversal_reason TEXT', 'reversed_by TEXT', 'reversed_at TEXT'
+]) ensureColumn('finance_entries', definition);
+db.exec(`UPDATE finance_entries SET expected_base_amount_minor=base_amount_minor WHERE expected_base_amount_minor=0 AND base_amount_minor>0`);
 
 export function transaction(fn) {
   db.exec('BEGIN IMMEDIATE');
