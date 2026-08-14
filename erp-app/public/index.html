@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#10271f">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <title>航贸云 ERP</title>
   <link rel="stylesheet" href="/styles.css?v=3">
   <link rel="stylesheet" href="/password-toggle.css?v=1">
@@ -68,7 +69,7 @@
     <main>
       <header class="topbar">
         <div><p id="breadcrumb">经营控制台 / 总览</p><h2 id="page-title">经营总览</h2></div>
-        <div class="top-actions"><button id="ask-ai" class="icon-btn ask-ai-button" type="button">✦ Ask AI</button><label class="scope-switch">数据范围 <select id="data-scope"><option value="personal">个人</option><option value="department">部门</option><option value="company">全公司</option></select></label><label class="search">⌕ <input id="global-search" placeholder="搜索当前页面"></label><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
+        <div class="top-actions"><button id="ask-ai" class="icon-btn ask-ai-button" type="button">✦ Ask AI</button><label class="scope-switch">数据范围 <select id="data-scope"><option value="personal">个人</option><option value="department">部门</option><option value="company">全公司</option></select></label><div class="global-search-wrap"><label class="search">⌕ <input id="global-search" autocomplete="off" placeholder="全局搜索单号、客户、产品"></label><div id="global-search-results" class="global-search-results hidden"></div></div><span id="today"></span><button id="refresh" class="icon-btn" title="刷新">↻</button></div>
       </header>
       <section id="content" class="content"></section>
     </main>
