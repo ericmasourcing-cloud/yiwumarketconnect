@@ -134,6 +134,17 @@ test('核心业务链与职责分离', async () => {
   assert.equal(batchCustomer.data.updated, 1);
   const batchedCustomerDetail = await request(admin, `/api/customers/${customer.data.id}`);
   assert.equal(batchedCustomerDetail.data.customer.stage, 'qualified');
+  const temporaryCustomer=await request(admin,'/api/customers','POST',{name:'临时展会客户',country:'意大利',email:'temporary@example.com',source:'exhibition',tags:'待核实'});
+  const temporaryDetail=await request(admin,`/api/customers/${temporaryCustomer.data.id}`);
+  const customerInactive=await request(admin,`/api/customers/${temporaryCustomer.data.id}`,'PUT',{version:temporaryDetail.data.customer.version,name:'临时展会客户',country:'意大利',email:'temporary@example.com',status:'inactive'});
+  assert.equal(customerInactive.status,200);
+  const inactiveDetail=await request(admin,`/api/customers/${temporaryCustomer.data.id}`);
+  assert.equal(inactiveDetail.data.customer.status,'inactive');
+  const customerActive=await request(admin,`/api/customers/${temporaryCustomer.data.id}`,'PUT',{version:inactiveDetail.data.customer.version,name:'临时展会客户',country:'意大利',email:'temporary@example.com',status:'active'});
+  assert.equal(customerActive.status,200);
+  const customerDeleted=await request(admin,`/api/customers/${temporaryCustomer.data.id}`,'DELETE',{reason:'重复导入且尚未产生业务'});
+  assert.equal(customerDeleted.status,200);
+  assert.equal(customerDeleted.data.recoverable,true);
 
   const multiQuote = await request(admin, '/api/quotes', 'POST', { customerId: customer.data.id, currency: 'USD', exchangeRate: 7.2, incoterm: 'FOB', paymentTerms: '30% deposit, 70% before shipment', validUntil: '2026-09-05', deliveryAt: '2026-10-01', notes: '多产品 PI 打印测试', items: [{ productId: product.data.id, description: '折叠露营灯 标准款', quantity: 100, unitPrice: 10, unitCost: 7 }, { productId: product.data.id, description: '折叠露营灯 礼盒款', quantity: 50, unitPrice: 12, unitCost: 8 }], charges: [{ name: '国际运费', kind: 'revenue', amount: 80 }, { name: '包装成本', kind: 'cost', amount: 30 }] });
   assert.equal(multiQuote.status, 201);
@@ -151,6 +162,8 @@ test('核心业务链与职责分离', async () => {
   assert.equal(quote.data.marginBps, 1200);
   const quoteDetail = await request(admin, `/api/quotes/${quote.data.id}`);
   assert.equal(quoteDetail.data.items.length, 1);
+  const linkedCustomerDelete=await request(admin,`/api/customers/${customer.data.id}`,'DELETE',{reason:'验证有关联报价时不能删除'});
+  assert.equal(linkedCustomerDelete.status,409);
   const submitted = await request(admin, `/api/quotes/${quote.data.id}/submit`, 'POST');
   assert.deepEqual(submitted.data, { status: 'approval_pending' });
   const approvals = await request(admin, '/api/approvals');
