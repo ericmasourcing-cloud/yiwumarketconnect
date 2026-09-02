@@ -21,7 +21,7 @@ const stats = [
   },
   {
     number: 14000000,
-    suffix: ' m²',
+    suffix: '㎡',
     label: 'Market Space',
     description: 'Five massive districts. I walk them every week so you don\'t have to.',
   },
@@ -67,11 +67,11 @@ function StatCard({ stat }: { stat: typeof stats[0] }) {
     >
       <span
         ref={numberRef}
-        className="font-display font-medium block whitespace-nowrap"
+        className="font-display font-medium block"
         style={{
-          fontSize: 'clamp(28px, 3.2vw, 64px)',
-          lineHeight: 1.1,
-          letterSpacing: '-0.02em',
+          fontSize: 'clamp(48px, 4vw, 96px)',
+          lineHeight: 1,
+          letterSpacing: '-0.03em',
           color: 'var(--orange)',
         }}
       >
@@ -129,7 +129,7 @@ export default function WhyYiwuSection() {
           className="reveal-child font-body text-[18px] leading-[1.7] max-w-[720px] mx-auto mt-12 text-center"
           style={{ color: 'var(--navy-60)' }}
         >
-          Yiwu Market isn't a website — it's a physical city of products. You can't compare prices online because most suppliers don't list publicly. That's why having someone on the ground matters. I spend 5 days a week at the market and supplier factories, comparing real samples, negotiating face-to-face, and checking production quality in person. I find options that match your budget and quality needs — so you don't have to fly to China to know what you're getting.
+          Yiwu Market isn't a website — it's a physical city of products. You can't compare prices online because most suppliers don't list publicly. That's why having someone on the ground matters. I visit the market 5 days a week, compare real samples, negotiate face-to-face, and find options that match your budget and quality needs.
         </p>
       </div>
     </section>

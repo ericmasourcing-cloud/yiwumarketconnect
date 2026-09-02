@@ -1,28 +1,46 @@
-import { Routes, Route } from 'react-router-dom'
+import { useState, useCallback } from 'react'
 import './App.css'
-import HomePage from '@/pages/HomePage'
-import EricPage from '@/pages/EricPage'
-import ServicesPage from '@/pages/ServicesPage'
-import AboutPage from '@/pages/AboutPage'
-import FAQPage from '@/pages/FAQPage'
-import CategoriesPage from '@/pages/CategoriesPage'
-import ContactPage from '@/pages/ContactPage'
-import BlogPage from '@/pages/BlogPage'
-import BlogPostPage from '@/pages/BlogPostPage'
+import Navigation from '@/components/Navigation'
+import FermatSpiral from '@/components/FermatSpiral'
+import Footer from '@/components/Footer'
+import HeroSection from '@/sections/HeroSection'
+import WhyYiwuSection from '@/sections/WhyYiwuSection'
+import ServicesSection from '@/sections/ServicesSection'
+import CategoriesSection from '@/sections/CategoriesSection'
+import HowItWorksSection from '@/sections/HowItWorksSection'
+import TrustSection from '@/sections/TrustSection'
+import InquiryFormSection from '@/sections/InquiryFormSection'
+import ContactCTASection from '@/sections/ContactCTASection'
 
 function App() {
+  const [heroVisible, setHeroVisible] = useState(true)
+
+  const handleHeroVisible = useCallback((visible: boolean) => {
+    setHeroVisible(visible)
+  }, [])
+
   return (
-    <Routes>
-      <Route path="/eric" element={<EricPage />} />
-      <Route path="/" element={<HomePage />} />
-      <Route path="/services" element={<ServicesPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/faq" element={<FAQPage />} />
-      <Route path="/categories" element={<CategoriesPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/blog" element={<BlogPage />} />
-      <Route path="/blog/:slug" element={<BlogPostPage />} />
-    </Routes>
+    <div className="relative" style={{ background: 'var(--warm-white)' }}>
+      {/* Three.js Fermat Spiral - fixed behind hero */}
+      <FermatSpiral isVisible={heroVisible} />
+
+      {/* Navigation */}
+      <Navigation />
+
+      {/* Page content */}
+      <main className="relative z-[1]">
+        <HeroSection onHeroVisible={handleHeroVisible} />
+        <WhyYiwuSection />
+        <ServicesSection />
+        <CategoriesSection />
+        <HowItWorksSection />
+        <TrustSection />
+        <InquiryFormSection />
+        <ContactCTASection />
+      </main>
+
+      <Footer />
+    </div>
   )
 }
 

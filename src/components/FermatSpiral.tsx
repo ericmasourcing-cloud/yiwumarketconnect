@@ -193,9 +193,9 @@ export default function FermatSpiral({ isVisible }: FermatSpiralProps) {
     window.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseleave', onMouseLeave)
 
-    // Touch - passive: true to allow page scrolling
+    // Touch
     const onTouchMove = (e: TouchEvent) => {
-      // Don't preventDefault - allow page scroll on mobile
+      e.preventDefault()
       const t = e.touches[0]
       if (!t) return
       mousePos.x = t.clientX
@@ -215,7 +215,7 @@ export default function FermatSpiral({ isVisible }: FermatSpiralProps) {
       }
     }
     const onTouchEnd = () => { mousePos.active = false }
-    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
     window.addEventListener('touchend', onTouchEnd)
 
     // Resize
